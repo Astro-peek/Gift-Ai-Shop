@@ -1,20 +1,21 @@
 "use client";
-import{useState}from"react";
+import{useState,useEffect}from"react";
 const GOLD="#C9A84C",DARK="#0A0804",SURFACE="#13110C",CARD="#1A1710",BORDER="#2E2A1E",MUTED="#6B6248";
 const Logo=()=><svg width="120" height="28" viewBox="0 0 148 40" fill="none"><rect x="1" y="9" width="22" height="22" rx="5" fill="#C9A84C" fillOpacity="0.12" stroke="#C9A84C" strokeWidth="1.1"/><path d="M12 9 L12 5 Q12 3 10 3 Q8 3 8 5 Q8 7 10 9 Z" fill="#C9A84C"/><path d="M12 9 L12 5 Q12 3 14 3 Q16 3 16 5 Q16 7 14 9 Z" fill="#C9A84C"/><rect x="6" y="9" width="12" height="3" rx="1.5" fill="#C9A84C"/><rect x="11" y="12" width="2" height="19" rx="1" fill="#C9A84C" fillOpacity="0.55"/><text x="30" y="28" fontFamily="Georgia,serif" fontSize="21" fontWeight="700" fill="#C9A84C" letterSpacing="1.5">GiftAI</text></svg>;
 
-const MOCK=[
-  {id:7,name:"Belgian Luxury Chocolate Box",price:2499,image:"https://images.unsplash.com/photo-1549007953-2f2dc0b24019?w=200&q=80",qty:2,category:"Gourmet Food"},
-  {id:3,name:"Sony WH-1000XM5 Headphones",price:6999,image:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&q=80",qty:1,category:"Premium Tech"},
-];
-
 export default function CartPage(){
-  const[cart,setCart]=useState(MOCK);
+  const[cart,setCart]=useState([]);
+  // Load cart from localStorage on mount
+  useEffect(()=>{
+    const stored=localStorage.getItem("giftai_cart");
+    if(stored) setCart(JSON.parse(stored));
+  },[]);
   const[step,setStep]=useState("cart");
   const[addr,setAddr]=useState({name:"",phone:"",pincode:"",street:"",city:"",state:""});
   const[imgErr,setImgErr]=useState({});
-  const upd=(id,d)=>setCart(p=>p.map(i=>i.id===id?{...i,qty:Math.max(1,i.qty+d)}:i));
-  const rm=(id)=>setCart(p=>p.filter(i=>i.id!==id));
+  const saveCart=(updated)=>{setCart(updated);localStorage.setItem("giftai_cart",JSON.stringify(updated));};
+  const upd=(id,d)=>{const next=cart.map(i=>i.id===id?{...i,qty:Math.max(1,i.qty+d)}:i);saveCart(next);};
+  const rm=(id)=>{const next=cart.filter(i=>i.id!==id);saveCart(next);};
   const sub=cart.reduce((s,i)=>s+i.price*i.qty,0);
   const ship=sub>3000?0:99;
   const total=sub+ship;

@@ -72,22 +72,30 @@ export default function RecommendPage(){
 
   const showToast=(m)=>{setToast(m);setTimeout(()=>setToast(""),2500);};
 
-  const pick=(opt)=>{
+  const pick=async(opt)=>{
     const key=["occasion","recipient","budget"][step];
     const na={...ans,[key]:opt};
     setAns(na);
     if(step<2){setStep(step+1);return;}
     setLoading(true);
-    setTimeout(()=>{
-      const scored=PRODUCTS.map(p=>({...p,sc:score(p,na.occasion,na.recipient,na.budget)})).filter(p=>p.sc>0).sort((a,b)=>b.sc-a.sc);
-      let res=scored.slice(0,3);
-      if(res.length<3){
-        const fallback=PRODUCTS.filter(p=>!res.find(r=>r.id===p.id)&&p.price<=BUD_MAX[na.budget]);
-        res=[...res,...fallback.slice(0,3-res.length)];
+    // Score locally
+    const scored=PRODUCTS.map(p=>({...p,sc:score(p,na.occasion,na.recipient,na.budget)})).filter(p=>p.sc>0).sort((a,b)=>b.sc-a.sc);
+    let res=scored.slice(0,3);
+    if(res.length<3){
+      const fallback=PRODUCTS.filter(p=>!res.find(r=>r.id===p.id)&&p.price<=BUD_MAX[na.budget]);
+      res=[...res,...fallback.slice(0,3-res.length)];
+    }
+    res=res.slice(0,3);
+    // Call LLM API for personalized reasons
+    try {
+      const resp=await fetch("/api/recommend",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({occasion:na.occasion,recipient:na.recipient,budget:na.budget,products:res})});
+      const data=await resp.json();
+      if(data.reasons&&data.reasons.length===res.length){
+        res=res.map((p,i)=>({...p,reason:data.reasons[i]||p.reason}));
       }
-      setResults(res.slice(0,3));
-      setLoading(false);
-    },2000);
+    } catch(_){}
+    setResults(res);
+    setLoading(false);
   };
 
   const reset=()=>{setStep(0);setAns({});setResults(null);};

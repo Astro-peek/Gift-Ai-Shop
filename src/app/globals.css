@@ -1,5 +1,164 @@
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #0d0d0d; color: #f0ece4; }
-a { color: inherit; }
-button { font-family: inherit; }
-input, select, textarea { font-family: inherit; }
+/* ── GiftAI Global Styles ─────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #0A0804;
+  color: #F0EAD6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0A0804;
+}
+::-webkit-scrollbar-thumb {
+  background: #2E2A1E;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #C9A84C44;
+}
+
+/* ── Input reset ─────────────────────────────────────────── */
+input, button, select, textarea {
+  font-family: 'Nunito', sans-serif;
+}
+
+input::placeholder {
+  color: #6B6248;
+}
+
+input:focus {
+  border-color: #C9A84C44 !important;
+  box-shadow: 0 0 0 3px #C9A84C0D;
+}
+
+/* ── Anchor reset ────────────────────────────────────────── */
+a {
+  color: inherit;
+}
+
+/* ── Shimmer animation (skeleton loaders) ────────────────── */
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Pulse animation (AI thinking) ──────────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.92); }
+}
+
+/* ── Responsive: hide non-essential nav items on mobile ─── */
+@media (max-width: 768px) {
+  nav {
+    padding: 0 1.2rem !important;
+  }
+
+  /* Stack hero padding */
+  section {
+    padding-left: 1.2rem !important;
+    padding-right: 1.2rem !important;
+  }
+
+  /* Responsive grid: single column on mobile */
+  .product-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Cart table responsive */
+  .cart-item-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  /* Checkout steps: compact on mobile */
+  .checkout-steps span {
+    display: none;
+  }
+
+  /* Order detail: stack columns */
+  .order-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Product detail: stack columns */
+  .product-detail-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Admin stat grid: 2-col on mobile */
+  .admin-stat-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Chat widget: full width on mobile */
+  .chat-widget {
+    width: calc(100vw - 32px) !important;
+    right: 16px !important;
+    bottom: 16px !important;
+  }
+
+  /* Hero font size */
+  h1 {
+    font-size: clamp(36px, 10vw, 72px) !important;
+  }
+
+  /* Recommend quiz: full-width buttons */
+  .quiz-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-stat-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .quiz-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Cart order summary: below items */
+  .cart-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Recommend results: horizontal card becomes vertical */
+  .result-card-inner {
+    flex-direction: column !important;
+  }
+  .result-card-image {
+    width: 100% !important;
+    min-width: unset !important;
+    height: 200px !important;
+  }
+
+  /* Product detail thumbnails: scroll horizontal */
+  .thumb-strip {
+    overflow-x: auto;
+    flex-wrap: nowrap !important;
+    padding-bottom: 8px;
+  }
+}
+
+/* ── model-viewer custom style ──────────────────────────── */
+model-viewer {
+  background-color: transparent;
+  --poster-color: transparent;
+}
