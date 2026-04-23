@@ -27,17 +27,30 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError("");
 
-    // Check if the user has admin role in public.User table via an API call or just try to login
-    // For simplicity in this hackathon, we'll login and then check if they can access /admin
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
     if (error) {
       setError(error.message);
       setLoading(false);
     } else {
-      // In a real app, we would verify the role here. 
-      // For now, we redirect to /admin. The middleware already protects /admin.
-      window.location.href = "/admin";
+      try {
+        await fetch("/api/auth/sync", { method: "POST" });
+        const accessRes = await fetch("/api/admin/check");
+        const accessData = await accessRes.json();
+
+        if (!accessRes.ok) {
+          await supabase.auth.signOut();
+          setError(accessData?.error || "This account does not have admin access.");
+          setLoading(false);
+          return;
+        }
+
+        window.location.href = "/admin";
+      } catch (err) {
+        await supabase.auth.signOut();
+        setError("Unable to verify admin access. Please try again.");
+        setLoading(false);
+      }
     }
   };
 

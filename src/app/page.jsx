@@ -197,7 +197,8 @@ export default function HomePage() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     localStorage.removeItem("giftai_user");
     setUser(null);
     setUserMenuOpen(false);
