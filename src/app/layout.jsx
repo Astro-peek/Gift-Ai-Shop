@@ -1,4 +1,5 @@
 import "./globals.css";
+import Script from "next/script";
 
 export const metadata = {
   title: "GiftAI — AI-Powered Luxury Gift Recommendations",
@@ -27,7 +28,13 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body style={{ margin: 0, padding: 0 }}>{children}</body>
+      <body style={{ margin: 0, padding: 0 }}>
+        {children}
+        <Script
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          strategy="beforeInteractive"
+        />
+      </body>
     </html>
   );
 }

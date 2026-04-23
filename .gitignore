@@ -8,3 +8,4 @@ prisma/generated/
 *.log
 .vercel
 coverage/
+env.download
