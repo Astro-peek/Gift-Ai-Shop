@@ -25,7 +25,7 @@ export async function POST(req) {
         total: orderDetails.total,
         address: orderDetails.address,
         paymentMethod: orderDetails.paymentMethod || "COD",
-        status: "placed",
+        status: "pending",
         items: {
           create: orderDetails.items.map(i => ({
             productId: i.id,
