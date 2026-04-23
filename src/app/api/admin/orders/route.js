@@ -6,6 +6,14 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 const LIFECYCLE = ["pending", "packed", "shipped", "delivered"];
+const LEGACY_STATUS_MAP = {
+  placed: "pending",
+  confirmed: "packed",
+};
+
+function normalizeStatus(status) {
+  return LEGACY_STATUS_MAP[status] || status;
+}
 
 async function requireAdmin() {
   const supabase = createRouteHandlerClient({ cookies });
@@ -33,7 +41,12 @@ export async function GET() {
       items: { include: { product: { select: { name: true, image: true } } } },
     },
   });
-  return NextResponse.json(orders);
+  return NextResponse.json(
+    orders.map((order) => ({
+      ...order,
+      status: normalizeStatus(order.status),
+    })),
+  );
 }
 
 // PATCH — advance order status in fixed lifecycle, add trackingId / deliveryNote
@@ -53,8 +66,10 @@ export async function PATCH(req) {
   const order = await prisma.order.findUnique({ where: { id }, select: { status: true } });
   if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
 
+  const currentStatus = normalizeStatus(order.status);
+
   // Block edits on completed orders
-  if (order.status === "delivered") {
+  if (currentStatus === "delivered") {
     return NextResponse.json({ error: "Completed orders cannot be modified" }, { status: 403 });
   }
 
@@ -67,7 +82,7 @@ export async function PATCH(req) {
         { status: 400 },
       );
     }
-    const currentIdx = LIFECYCLE.indexOf(order.status);
+    const currentIdx = LIFECYCLE.indexOf(currentStatus);
     const newIdx = LIFECYCLE.indexOf(status);
     if (newIdx < currentIdx) {
       return NextResponse.json({ error: "Cannot move order backward in the lifecycle" }, { status: 400 });
