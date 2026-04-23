@@ -1,107 +1,173 @@
-# GiftAI ✨ 
-### AI-Powered Luxury Gift Recommendations & Concierge
+# GiftAI ✨
 
-GiftAI is a premium e-commerce platform designed to eliminate the stress of finding the perfect gift. By combining high-end luxury curation with cutting-edge Google Gemini AI intelligence, GiftAI offers a personalized concierge experience that handpicks the ideal gift for any occasion, recipient, or budget.
+### AI-Powered Luxury Gift Recommendations & Smart Concierge
+
+GiftAI is a next-generation AI-driven e-commerce platform designed to eliminate the stress of finding the perfect gift. By combining **luxury product curation** with **Google Gemini AI intelligence**, the platform delivers a personalized concierge experience tailored to the user's intent, emotions, and budget.
 
 ---
 
-## 🚀 Vision & Mission
-"Gifting is an art, not a chore." GiftAI aims to elevate the gifting experience by providing a tailored, luxury-first approach where AI understands the sentiment behind the gift.
+## 🌍 Problem Statement
+
+Choosing the right gift is often:
+
+* Time-consuming
+* Emotionally uncertain
+* Overwhelming due to too many choices
+
+Most platforms focus on **products**, not **intent**. Users struggle to translate feelings (e.g., appreciation, celebration) into meaningful gifts.
+
+---
+
+## 💡 Solution
+
+GiftAI bridges this gap by using **AI-powered conversational intelligence** to:
+
+* Understand user intent in natural language
+* Interpret emotional and contextual cues
+* Recommend highly relevant, premium gifts instantly
+
+---
+
+## 🧠 How AI Works
+
+* Powered by **Google Gemini 1.5 Pro**
+* Uses prompt-based contextual understanding
+* Processes:
+
+  * Occasion (birthday, graduation, etc.)
+  * Budget constraints
+  * Personal preferences (eco-friendly, luxury, etc.)
+* Outputs **curated, actionable gift suggestions** with product links
 
 ---
 
 ## 🛠️ Tech Stack
-- **Framework**: Next.js 14 (App Router)
-- **Language**: JavaScript (ES6+)
-- **Styling**: Vanilla CSS (Custom Premium Dark Theme)
-- **Database**: Supabase PostgreSQL
-- **ORM**: Prisma
-- **Auth**: Supabase Auth
-- **AI Engine**: Google Gemini 1.5 Pro
-- **Payments**: Razorpay Integrated Gateway
+
+* **Frontend:** Next.js 14 (App Router), JavaScript
+* **Styling:** Custom Luxury Dark Theme (Vanilla CSS)
+* **Backend & DB:** Supabase PostgreSQL
+* **ORM:** Prisma
+* **Authentication:** Supabase Auth
+* **AI Engine:** Google Gemini 1.5 Pro
+* **Payments:** Razorpay (UPI, Cards, Netbanking, COD)
 
 ---
 
 ## 🎯 Key Features
 
-### 1. AI Gift Scout (Concierge)
-- Real-time interactive chat powered by Gemini AI.
-- Understands complex gifting requirements (e.g., "Something eco-friendly for a graduation gift under ₹4,000").
-- Context-aware recommendations with direct links to products.
+### 🤖 AI Gift Scout (Smart Concierge)
 
-### 2. Personalized User Profiles
-- Centralized dashboard for users to manage their identity.
-- Persistent delivery addresses and contact information stored in the database.
-- One-click logout and secure session management.
-
-### 3. Smart Guest-to-Buyer Flow
-- Guests can browse the full luxury catalog and add items to their cart without pressure.
-- **Auth Barrier**: Checkout and Order tracking are protected, ensuring a secure and verifiable buyer experience.
-
-### 4. Advanced Admin Dashboard
-- Real-time business intelligence for staff.
-- Visual revenue tracking, active order counts, and customer metrics.
-- Role-based security (Only users with `ADMIN` role in Prisma can access).
-
-### 5. Seamless Checkout & Payments
-- **Razorpay Integration**: Supports UPI, Credit/Debit Cards, and Netbanking.
-- **Cash on Delivery (COD)**: For enhanced customer trust and convenience.
-- **Order Persistence**: Every order is saved to the database with detailed item tracking.
+* Real-time conversational AI
+* Context-aware recommendations
+* Handles complex queries like:
+  *"Luxury eco-friendly gift under ₹4000 for graduation"*
 
 ---
 
-## 🗺️ Navigation & Access Rules
+### 👤 Personalized User Profiles
 
-| Feature / Page      | Guest (Anonymous)         | Logged-in User          | Admin Staff              |
-| :------------------ | :------------------------ | :---------------------- | :----------------------- |
-| **Landing Page**    | ✅ Full Access            | ✅ Full Access          | ✅ Full Access           |
-| **AI Chat Scout**   | ✅ Enabled                | ✅ Enabled              | ✅ Enabled               |
-| **Add to Cart**     | ✅ Allowed                | ✅ Allowed              | ✅ Allowed               |
-| **Checkout Progress**| ❌ Redirects to Login     | ✅ Full Access          | ✅ Full Access           |
-| **My Profile**      | ❌ Redirects to Login     | ✅ Full Access          | ✅ Full Access           |
-| **Order History**   | ❌ Redirects to Login     | ✅ See Own Orders       | ✅ See Own Orders        |
-| **Admin Dashboard** | ❌ Redirects to Staff Login| ❌ **Access Denied**    | ✅ Full Management       |
+* Persistent addresses & user data
+* Secure authentication & session management
 
 ---
 
-## 🔧 Installation & Setup
+### 🛒 Smart Guest-to-Buyer Flow
 
-1. **Clone the repository**:
-   ```bash
-   git clone <repo-url>
-   cd giftai
-   ```
+* Browse & add to cart without login
+* Secure checkout & order tracking for authenticated users
 
-2. **Install Dependencies**:
-   ```bash
-   npm install
-   ```
+---
 
-3. **Configure Environment Variables**:
-   Create a `.env` file in the root and add:
-   - `DATABASE_URL`: Your Supabase PostgreSQL connection string.
-   - `NEXT_PUBLIC_SUPABASE_URL` & `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
-   - `RAZORPAY_KEY_ID` & `RAZORPAY_KEY_SECRET`.
-   - `GEMINI_API_KEY`: Your Google AI Studio key.
+### 📊 Admin Dashboard
 
-4. **Sync Database Schema**:
-   ```bash
-   npx prisma db push
-   ```
+* Real-time analytics (revenue, orders, users)
+* Role-based access control
+* Business intelligence insights
 
-5. **Run Locally**:
-   ```bash
-   npm run dev
-   ```
+---
+
+### 💳 Seamless Checkout
+
+* Razorpay integration
+* Supports UPI, Cards, Netbanking
+* Cash on Delivery option
+* Full order persistence
+
+---
+
+## 🔐 Access Control
+
+| Feature         | Guest | User | Admin |
+| --------------- | ----- | ---- | ----- |
+| Browse Products | ✅     | ✅    | ✅     |
+| AI Chat         | ✅     | ✅    | ✅     |
+| Add to Cart     | ✅     | ✅    | ✅     |
+| Checkout        | ❌     | ✅    | ✅     |
+| Profile         | ❌     | ✅    | ✅     |
+| Orders          | ❌     | ✅    | ✅     |
+| Admin Panel     | ❌     | ❌    | ✅     |
+
+---
+
+## ⚙️ Installation
+
+```bash
+git clone <repo-url>
+cd giftai
+npm install
+```
+
+### 🔑 Environment Variables (.env)
+
+```
+DATABASE_URL=
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+RAZORPAY_KEY_ID=
+RAZORPAY_KEY_SECRET=
+GEMINI_API_KEY=
+```
+
+```bash
+npx prisma db push
+npm run dev
+```
 
 ---
 
 ## 🎨 Design Philosophy
-GiftAI uses a **Luxury Dark Theme** to evoke a sense of exclusivity:
-- **Background**: `#0A0804` (Deep Espresso/Black)
-- **Accents**: `#C9A84C` (Antique Gold)
-- **Typography**: `Cormorant Garamond` (Serif) for elegance, `Nunito` (Sans-Serif) for clarity.
-- **Interactive UI**: Glassmorphism, smooth CSS transitions, and micro-animations.
+
+GiftAI follows a **Luxury Minimalism UI**:
+
+* Background: Deep Espresso (#0A0804)
+* Accent: Antique Gold (#C9A84C)
+* Fonts:
+
+  * Cormorant Garamond (Elegance)
+  * Nunito (Readability)
+
+✨ Features:
+
+* Glassmorphism
+* Micro-interactions
+* Smooth transitions
 
 ---
-© 2024 GiftAI Team. Built for the Next-Gen E-Commerce Hackathon.
+
+## 🚀 Future Enhancements
+
+* 🎙️ Voice-based AI gifting assistant
+* 🧠 Emotion detection via sentiment analysis
+* 🕶️ AR-based gift preview
+* 🎁 Social gifting & group contributions
+
+---
+
+## 🏆 Hackathon Value
+
+GiftAI is not just an e-commerce app — it is an **AI-driven decision-making system** that transforms gifting into an intelligent, emotional, and personalized experience.
+
+---
+
+© 2024 GiftAI Team
+Built for Next-Gen E-Commerce Hackathon 🚀
