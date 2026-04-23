@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 
 // ── Design tokens ────────────────────────────────────────────────
@@ -223,9 +224,9 @@ export default function AdminDashboard() {
 
   const STATUS_COLOR = {
     delivered: "#52b788",
-    shipped: GOLD,
-    confirmed: "#378add",
-    placed: MUTED,
+    shipped: "#C9A84C",
+    packed: "#378add",
+    pending: "#6B6248",
   };
 
   return (
@@ -253,6 +254,68 @@ export default function AdminDashboard() {
             <div style={{ flex: 1, height: "1px", background: BORDER }} />
             <div style={{ color: GOLD, fontSize: "16px", opacity: 0.6 }}>◆</div>
             <div style={{ flex: 1, height: "1px", background: BORDER }} />
+          </div>
+          <div style={{ marginTop: "18px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <Link
+              href="/admin"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: "999px",
+                border: `1px solid ${GOLD}`,
+                padding: "9px 16px",
+                fontSize: "12px",
+                fontWeight: 700,
+                letterSpacing: "1px",
+                textTransform: "uppercase",
+                textDecoration: "none",
+                color: DARK,
+                background: GOLD,
+              }}
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="/admin/products"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: "999px",
+                border: `1px solid ${BORDER}`,
+                padding: "9px 16px",
+                fontSize: "12px",
+                fontWeight: 700,
+                letterSpacing: "1px",
+                textTransform: "uppercase",
+                textDecoration: "none",
+                color: MUTED,
+                background: "transparent",
+              }}
+            >
+              Products
+            </Link>
+            <Link
+              href="/admin/orders"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: "999px",
+                border: `1px solid ${BORDER}`,
+                padding: "9px 16px",
+                fontSize: "12px",
+                fontWeight: 700,
+                letterSpacing: "1px",
+                textTransform: "uppercase",
+                textDecoration: "none",
+                color: MUTED,
+                background: "transparent",
+              }}
+            >
+              Orders
+            </Link>
           </div>
         </div>
 
