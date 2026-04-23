@@ -11,16 +11,13 @@ const BORDER = "#2E2A1E";
 const MUTED = "#6B6248";
 const CREAM = "#F0EAD6";
 
-// ── Mock data (matches your Sales schema: month / revenue / orders) ──
-const SALES = [
-  { m: "Jan", s: 45200, o: 38 },
-  { m: "Feb", s: 61800, o: 52 },
-  { m: "Mar", s: 53400, o: 44 },
-  { m: "Apr", s: 78900, o: 67 },
-  { m: "May", s: 92100, o: 81 },
-  { m: "Jun", s: 87300, o: 74 },
-  { m: "Jul", s: 104500, o: 93 },
-  { m: "Aug", s: 98200, o: 88 },
+const EMPTY_REVENUE_SERIES = [
+  { m: "Jan", s: 0, o: 0 },
+  { m: "Feb", s: 0, o: 0 },
+  { m: "Mar", s: 0, o: 0 },
+  { m: "Apr", s: 0, o: 0 },
+  { m: "May", s: 0, o: 0 },
+  { m: "Jun", s: 0, o: 0 },
 ];
 
 const TOP_PRODUCTS = [
@@ -139,7 +136,7 @@ function MetricCard({ label, value, sub, color, prefix = "", suffix = "", delay 
 
 // ── Bar chart ─────────────────────────────────────────────────────
 function BarChart({ data }) {
-  const maxS = Math.max(...data.map((d) => d.s));
+  const maxS = Math.max(1, ...data.map((d) => d.s));
   return (
     <div style={{ display: "flex", alignItems: "flex-end", gap: "10px", height: "180px", paddingBottom: "28px", position: "relative" }}>
       {data.map((d, i) => {
@@ -180,6 +177,7 @@ function MiniDonut({ value, max, color, size = 36 }) {
 export default function AdminDashboard() {
   const [stats, setStats] = useState([]);
   const [recentOrders, setRecentOrders] = useState([]);
+  const [revenueSeries, setRevenueSeries] = useState(EMPTY_REVENUE_SERIES);
   const [loading, setLoading] = useState(true);
   const [forbidden, setForbidden] = useState(false);
 
@@ -195,6 +193,7 @@ export default function AdminDashboard() {
         const data = await res.json();
         setStats(data.stats);
         setRecentOrders(data.recentOrders);
+        setRevenueSeries(data.revenueSeries || EMPTY_REVENUE_SERIES);
       } catch (err) {
         console.error("Failed to load admin stats");
       } finally {
@@ -339,7 +338,7 @@ export default function AdminDashboard() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: "20px", marginBottom: "20px" }}>
           <div className="gai-card" style={{ padding: "28px" }}>
             <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "22px", color: CREAM, marginBottom: "24px" }}>Monthly Revenue Graph</div>
-            <BarChart data={SALES} />
+            <BarChart data={revenueSeries} />
           </div>
           <div className="gai-card" style={{ padding: "24px" }}>
             <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "22px", color: CREAM, marginBottom: "20px" }}>Top Inventory Items</div>
