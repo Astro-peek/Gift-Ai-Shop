@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 const GOLD = "#C9A84C", DARK = "#0A0804", SURFACE = "#13110C", CARD = "#1A1710", BORDER = "#2E2A1E", MUTED = "#6B6248";
 
@@ -14,23 +15,81 @@ const Logo = () => (
   </svg>
 );
 
-const MOCK = [
-  { id: 7, name: "Belgian Luxury Chocolate Box", price: 2499, image: "https://images.unsplash.com/photo-1549007953-2f2dc0b24019?w=200&q=80", qty: 2, category: "Gourmet Food" },
-  { id: 3, name: "Sony WH-1000XM5 Headphones", price: 6999, image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&q=80", qty: 1, category: "Premium Tech" },
-];
-
 export default function CartPage() {
-  const [cart, setCart] = useState(MOCK);
+  const supabase = createClientComponentClient();
+  const [cart, setCart] = useState([]);
+  const [mounted, setMounted] = useState(false);
   const [step, setStep] = useState("cart");
   const [addr, setAddr] = useState({ name: "", phone: "", pincode: "", street: "", city: "", state: "" });
   const [imgErr, setImgErr] = useState({});
   const [paying, setPaying] = useState(false);
+  const [method, setMethod] = useState("RAZORPAY"); // RAZORPAY | COD
+  const [user, setUser] = useState(null);
 
-  const upd = (id, d) => setCart(p => p.map(i => i.id === id ? { ...i, qty: Math.max(1, i.qty + d) } : i));
-  const rm = (id) => setCart(p => p.filter(i => i.id !== id));
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user || null);
+    };
+    fetchUser();
+
+    setMounted(true);
+    const saved = localStorage.getItem("giftai_cart");
+    if (saved) setCart(JSON.parse(saved));
+  }, []);
+
+  if (!mounted) return <div style={{ minHeight: "100vh", background: DARK }} />;
+
+  const saveCart = (newCart) => {
+    setCart(newCart);
+    localStorage.setItem("giftai_cart", JSON.stringify(newCart));
+  };
+
+  const upd = (id, d) => saveCart(cart.map(i => i.id === id ? { ...i, qty: Math.max(1, i.qty + d) } : i));
+  const rm = (id) => saveCart(cart.filter(i => i.id !== id));
   const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const ship = sub > 3000 ? 0 : 99;
   const total = sub + ship;
+
+  const handleProceed = () => {
+    if (!user) {
+      window.location.href = `/login?redirect=${encodeURIComponent("/cart")}`;
+      return;
+    }
+    setStep("address");
+  };
+
+  const handleCOD = async () => {
+    setPaying(true);
+    try {
+      const orderDetails = {
+        userId: user.id,
+        userEmail: user.email,
+        userName: user.user_metadata?.full_name || user.email.split("@")[0],
+        total,
+        address: `${addr.street}, ${addr.city}, ${addr.state} - ${addr.pincode} (PH: ${addr.phone})`,
+        paymentMethod: "COD",
+        items: cart
+      };
+
+      const res = await fetch("/api/orders/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderDetails })
+      });
+
+      if (res.ok) {
+        setCart([]); // Clear cart
+        setStep("success");
+      } else {
+        alert("Failed to confirm order. Please try again.");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setPaying(false);
+    }
+  };
 
   const handleRazorpayPayment = async () => {
     setPaying(true);
@@ -40,26 +99,36 @@ export default function CartPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount: total }),
       });
-      const { orderId, amount: rzpAmount, currency } = await res.json();
+      const data = await res.json();
 
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: rzpAmount,
-        currency,
-        name: "GiftAI",
-        description: "Luxury Gift Order",
-        order_id: orderId,
+        amount: data.amount,
+        currency: "INR",
+        name: "GiftAI Luxury",
+        description: "Order Payment",
+        order_id: data.orderId,
         handler: async (response) => {
-          const verify = await fetch("/api/razorpay/verify", {
+          const orderDetails = {
+            userId: user.id,
+            userEmail: user.email,
+            userName: user.user_metadata?.full_name || user.email.split("@")[0],
+            total,
+            address: `${addr.street}, ${addr.city}, ${addr.state} - ${addr.pincode} (PH: ${addr.phone})`,
+            items: cart
+          };
+
+          const verifyRes = await fetch("/api/razorpay/verify", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(response),
+            body: JSON.stringify({ ...response, orderDetails }),
           });
-          const result = await verify.json();
-          if (result.success) {
+          const verifyData = await verifyRes.json();
+          if (verifyData.verified) {
+            setCart([]);
             setStep("success");
           } else {
-            alert("Payment verification failed. Contact support.");
+            alert("Payment verification failed.");
           }
         },
         prefill: {
@@ -118,7 +187,11 @@ export default function CartPage() {
         {step === "cart" && (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "28px" }}>
             <div>
+              <div style={{ marginBottom: "16px" }}>
+                <a href="/" style={{ color: MUTED, textDecoration: "none", fontSize: "14px", fontWeight: 700 }}>← Back to Shop</a>
+              </div>
               <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "40px", marginBottom: "28px", color: "#F0EAD6" }}>Your Cart</h1>
+
               {cart.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "80px 0", color: MUTED }}>
                   <div style={{ fontSize: "40px", color: GOLD, marginBottom: "16px", fontFamily: "'Cormorant Garamond',serif" }}>◇</div>
@@ -169,9 +242,8 @@ export default function CartPage() {
                 <span style={{ fontWeight: 700, fontSize: "16px", color: "#F0EAD6" }}>Total</span>
                 <span style={{ fontWeight: 800, fontSize: "24px", color: GOLD, fontFamily: "'Cormorant Garamond',serif" }}>₹{total.toLocaleString()}</span>
               </div>
-              <button
-                onClick={() => cart.length > 0 && setStep("address")}
-                style={{ width: "100%", background: cart.length > 0 ? GOLD : BORDER, border: "none", borderRadius: "8px", padding: "14px", fontFamily: "'Nunito',sans-serif", fontWeight: 800, fontSize: "15px", cursor: cart.length > 0 ? "pointer" : "default", color: DARK, letterSpacing: "0.5px" }}>
+              <button onClick={handleProceed}
+                style={{ width:"100%", background:cart.length>0?GOLD:BORDER, border:"none", borderRadius:"8px", padding:"14px", fontFamily:"'Nunito',sans-serif", fontWeight:800, fontSize:"15px", cursor:cart.length>0?"pointer":"default", color:DARK, letterSpacing:"0.5px" }}>
                 Proceed to Checkout →
               </button>
             </div>
@@ -204,17 +276,35 @@ export default function CartPage() {
         {/* ── PAYMENT STEP ── */}
         {step === "payment" && (
           <div style={{ maxWidth: "520px", margin: "0 auto" }}>
-            <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "40px", marginBottom: "28px", color: "#F0EAD6" }}>Payment</h1>
+            <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "40px", marginBottom: "28px", color: "#F0EAD6" }}>Payment Method</h1>
 
-            {/* Test card info */}
-            <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: "14px", padding: "24px", marginBottom: "20px" }}>
-              <div style={{ fontSize: "10px", color: GOLD, fontWeight: 800, letterSpacing: "1.5px", marginBottom: "16px" }}>RAZORPAY TEST CARD</div>
-              <div style={{ fontFamily: "monospace", fontSize: "20px", letterSpacing: "4px", color: "#F0EAD6", marginBottom: "12px" }}>4111 1111 1111 1111</div>
-              <div style={{ display: "flex", gap: "28px", color: MUTED, fontSize: "13px" }}>
-                <span>Expiry: <span style={{ color: "#F0EAD6" }}>12/26</span></span>
-                <span>CVV: <span style={{ color: "#F0EAD6" }}>123</span></span>
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "28px" }}>
+              <div onClick={() => setMethod("RAZORPAY")}
+                style={{ padding: "20px", borderRadius: "14px", border: `1px solid ${method==="RAZORPAY"?GOLD:BORDER}`, background: CARD, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: "14px", color: method==="RAZORPAY"?GOLD:"#F0EAD6" }}>Razorpay (Cards, UPI, Netbanking)</div>
+                  <div style={{ fontSize: "12px", color: MUTED, marginTop: "4px" }}>Fast, secure & reliable (Select UPI in next step)</div>
+                </div>
+                {method==="RAZORPAY" && <div style={{ color: GOLD }}>✓</div>}
+              </div>
+              <div onClick={() => setMethod("COD")}
+                style={{ padding: "20px", borderRadius: "14px", border: `1px solid ${method==="COD"?GOLD:BORDER}`, background: CARD, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: "14px", color: method==="COD"?GOLD:"#F0EAD6" }}>Cash on Delivery</div>
+                  <div style={{ fontSize: "12px", color: MUTED, marginTop: "4px" }}>Pay when your luxury gift arrives</div>
+                </div>
+                {method==="COD" && <div style={{ color: GOLD }}>✓</div>}
               </div>
             </div>
+
+            {method === "RAZORPAY" && (
+              <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: "14px", padding: "24px", marginBottom: "20px" }}>
+                <div style={{ fontSize: "10px", color: GOLD, fontWeight: 800, letterSpacing: "1.5px", marginBottom: "16px" }}>RAZORPAY SECURE</div>
+                <div style={{ display: "flex", gap: "28px", color: "#F0EAD6", fontSize: "14px" }}>
+                   Supports Cards, UPI, NetBanking
+                </div>
+              </div>
+            )}
 
             {/* Order total summary */}
             <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: "14px", padding: "20px", marginBottom: "24px" }}>
@@ -239,7 +329,7 @@ export default function CartPage() {
               </button>
 
               <button
-                onClick={handleRazorpayPayment}
+                onClick={method === "RAZORPAY" ? handleRazorpayPayment : handleCOD}
                 disabled={paying}
                 style={{
                   flex: 2,
@@ -254,12 +344,11 @@ export default function CartPage() {
                   color: "#0A0804",
                   letterSpacing: "0.5px",
                 }}>
-                {paying ? "Processing…" : `Pay ₹${total.toLocaleString()} →`}
+                {paying ? "Processing…" : (method === "RAZORPAY" ? `Pay ₹${total.toLocaleString()} →` : "Confirm Order →")}
               </button>
             </div>
           </div>
         )}
-
       </div>
     </div>
   );

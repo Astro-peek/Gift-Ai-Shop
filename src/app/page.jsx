@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 const GOLD = "#C9A84C";
 const GOLD2 = "#E8C97A";
@@ -59,10 +60,12 @@ function SkeletonCard() {
 }
 
 export default function HomePage() {
+  const supabase = createClientComponentClient();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
+  const [mounted, setMounted] = useState(false);
   const [toast, setToast] = useState("");
   const [chatOpen, setChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
@@ -79,26 +82,31 @@ export default function HomePage() {
 
   // ── Load from localStorage on mount ──────────────────────────────
   useEffect(() => {
-    // Persistent cart from localStorage
-    const storedCart = localStorage.getItem("giftai_cart");
-    if (storedCart) setCart(JSON.parse(storedCart));
-
-    const storedWish = localStorage.getItem("giftai_wishlist");
-    if (storedWish) setWishlist(JSON.parse(storedWish));
-
     // Simulate loading from DB (or Prisma in production)
     setTimeout(() => setProductsLoading(false), 900);
 
-    // Load user from Supabase session (graceful — works even without Supabase configured)
-    try {
-      const stored = localStorage.getItem("giftai_user");
-      if (stored) setUser(JSON.parse(stored));
-    } catch (_) {}
+    const fetchSess = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUser({
+          name: session.user.user_metadata?.full_name || session.user.email.split("@")[0],
+          email: session.user.email
+        });
+      }
+    };
+    fetchSess();
+
+    setMounted(true);
+    const savedCart = localStorage.getItem("giftai_cart");
+    if (savedCart) setCart(JSON.parse(savedCart));
+    const savedWish = localStorage.getItem("giftai_wishlist");
+    if (savedWish) setWishlist(JSON.parse(savedWish));
 
     // Personalized feed: load viewed categories
     const viewed = JSON.parse(localStorage.getItem("giftai_viewed_cats") || "[]");
     setViewedCategories(viewed);
   }, []);
+
 
   // ── Compute personalized featured feed ───────────────────────────
   useEffect(() => {
@@ -124,6 +132,8 @@ export default function HomePage() {
   }, [wishlist]);
 
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior:"smooth" }); }, [msgs]);
+
+  if (!mounted) return <div style={{ minHeight: "100vh", background: DARK }} />;
 
   const showToast = (m) => { setToast(m); setTimeout(() => setToast(""), 2800); };
 
@@ -194,7 +204,7 @@ export default function HomePage() {
     showToast("Signed out successfully");
   };
 
-  const userInitials = user?.name ? user.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase() : "U";
+  const userProfileIcon = user ? (user.name ? user.name[0].toUpperCase() : "U") : "👤";
 
   return (
     <div style={{ fontFamily:"'Nunito',sans-serif", minHeight:"100vh", background:DARK, color:"#F0EAD6" }}>
@@ -217,8 +227,8 @@ export default function HomePage() {
           {/* User avatar with dropdown */}
           <div style={{ position:"relative" }}>
             <div id="user-menu-btn" onClick={() => setUserMenuOpen(o => !o)}
-              style={{ width:"32px", height:"32px", borderRadius:"50%", background:user ? `${GOLD}28` : `${GOLD}18`, border:`1px solid ${user ? GOLD+"55" : BORDER}`, display:"flex", alignItems:"center", justifyContent:"center", color:GOLD, fontWeight:800, fontSize:"12px", cursor:"pointer", transition:"all 0.2s" }}>
-              {userInitials}
+              style={{ width:"32px", height:"32px", borderRadius:"50%", background:user ? `${GOLD}28` : `${GOLD}18`, border:`1px solid ${user ? GOLD+"55" : BORDER}`, display:"flex", alignItems:"center", justifyContent:"center", color:GOLD, fontWeight:800, fontSize:user?"12px":"16px", cursor:"pointer", transition:"all 0.2s" }}>
+              {userProfileIcon}
             </div>
             {userMenuOpen && (
               <div style={{ position:"absolute", top:"44px", right:0, background:SURFACE, border:`1px solid ${BORDER}`, borderRadius:"12px", padding:"8px", minWidth:"180px", zIndex:200, boxShadow:"0 16px 40px #000000cc" }}>
@@ -228,6 +238,7 @@ export default function HomePage() {
                       <div style={{ color:"#F0EAD6", fontWeight:700, marginBottom:"2px" }}>{user.name}</div>
                       <div>{user.email}</div>
                     </div>
+                    <a href="/profile" style={{ display:"block", padding:"9px 14px", color:MUTED, textDecoration:"none", fontSize:"13px", borderRadius:"7px" }}>My Profile</a>
                     <a href="/orders" style={{ display:"block", padding:"9px 14px", color:MUTED, textDecoration:"none", fontSize:"13px", borderRadius:"7px" }}>My Orders</a>
                     <button onClick={handleLogout} style={{ width:"100%", textAlign:"left", padding:"9px 14px", color:"#e24b4a", background:"none", border:"none", fontSize:"13px", cursor:"pointer", fontFamily:"'Nunito',sans-serif", borderRadius:"7px" }}>Sign Out</button>
                   </>

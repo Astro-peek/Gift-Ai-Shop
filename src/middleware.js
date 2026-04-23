@@ -13,11 +13,14 @@ export async function middleware(req) {
   } = await supabase.auth.getSession();
 
   const path = req.nextUrl.pathname;
+  if (path.startsWith("/admin/login")) return res;
+
   const isProtected = PROTECTED.some((p) => path.startsWith(p));
 
   // If accessing a protected route without a session, redirect to login
   if (isProtected && !session) {
-    const loginUrl = new URL("/login", req.url);
+    const isSpecialAdmin = path.startsWith("/admin");
+    const loginUrl = new URL(isSpecialAdmin ? "/admin/login" : "/login", req.url);
     loginUrl.searchParams.set("redirect", path);
     return NextResponse.redirect(loginUrl);
   }
