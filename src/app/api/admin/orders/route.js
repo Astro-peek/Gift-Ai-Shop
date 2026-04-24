@@ -2,6 +2,7 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { notifyOrderStatusUpdated } from "../../../../controllers/orderController";
 
 const prisma = new PrismaClient();
 
@@ -93,6 +94,21 @@ export async function PATCH(req) {
   if (trackingId !== undefined) data.trackingId = trackingId;
   if (deliveryNote !== undefined) data.deliveryNote = deliveryNote;
 
-  const updated = await prisma.order.update({ where: { id }, data });
+  const updated = await prisma.order.update({
+    where: { id },
+    data,
+    include: {
+      user: { select: { id: true, name: true, email: true, phone: true } },
+    },
+  });
+
+  if (data.status && data.status !== currentStatus) {
+    await notifyOrderStatusUpdated({
+      prisma,
+      order: updated,
+      status: data.status,
+    });
+  }
+
   return NextResponse.json(updated);
 }

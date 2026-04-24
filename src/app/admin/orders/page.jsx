@@ -24,13 +24,6 @@ const STATUS_COLOR = {
   delivered: "#52b788",
 };
 
-const TEMPLATE_BY_STATUS = {
-  pending: "ORDER_CONFIRMED",
-  packed: "ORDER_PACKED",
-  shipped: "ORDER_SHIPPED",
-  delivered: "ORDER_DELIVERED",
-};
-
 const tabBaseStyle = {
   display: "inline-flex",
   alignItems: "center",
@@ -71,10 +64,8 @@ export default function AdminOrdersPage() {
   const [forbidden, setForbidden] = useState(false);
   const [apiError, setApiError] = useState("");
   const [savingId, setSavingId] = useState(null);
-  const [notifyOpenId, setNotifyOpenId] = useState(null);
   const [trackingInputId, setTrackingInputId] = useState(null);
   const [trackingDrafts, setTrackingDrafts] = useState({});
-  const [toast, setToast] = useState("");
 
   async function loadOrders() {
     try {
@@ -99,12 +90,6 @@ export default function AdminOrdersPage() {
   useEffect(() => {
     loadOrders();
   }, []);
-
-  useEffect(() => {
-    if (!toast) return;
-    const timer = setTimeout(() => setToast(""), 3000);
-    return () => clearTimeout(timer);
-  }, [toast]);
 
   async function patchOrder(order, nextStatus) {
     const payload = { id: order.id, status: nextStatus };
@@ -150,31 +135,6 @@ export default function AdminOrdersPage() {
     }
 
     await patchOrder(order, nextStatus);
-  }
-
-  async function sendNotification(order) {
-    const template = TEMPLATE_BY_STATUS[order.status];
-    if (!template) return;
-
-    try {
-      setSavingId(order.id);
-      setApiError("");
-      const res = await fetch("/api/admin/notifications", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ template, orderId: order.id }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data?.error || "Failed to send notification");
-      }
-      setNotifyOpenId(null);
-      setToast("Notification sent ✓");
-    } catch (err) {
-      setApiError(err.message || "Failed to send notification");
-    } finally {
-      setSavingId(null);
-    }
   }
 
   if (loading) {
@@ -252,27 +212,6 @@ export default function AdminOrdersPage() {
           position: "relative",
         }}
       >
-        {toast && (
-          <div
-            style={{
-              position: "fixed",
-              top: "24px",
-              right: "24px",
-              background: GOLD,
-              color: DARK,
-              padding: "10px 14px",
-              borderRadius: "10px",
-              fontWeight: 800,
-              fontSize: "13px",
-              zIndex: 30,
-              border: `1px solid ${GOLD}`,
-              boxShadow: "0 10px 24px rgba(0,0,0,0.25)",
-            }}
-          >
-            {toast}
-          </div>
-        )}
-
         <div style={{ marginBottom: "32px" }}>
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
             <div>
@@ -421,7 +360,6 @@ export default function AdminOrdersPage() {
                 {orders.map((order) => {
                   const nextStatus = getNextStatus(order.status);
                   const isDelivered = order.status === "delivered";
-                  const template = TEMPLATE_BY_STATUS[order.status];
                   const statusColor = STATUS_COLOR[order.status] || MUTED;
 
                   return (
@@ -550,52 +488,6 @@ export default function AdminOrdersPage() {
                               </button>
                             </div>
                           )}
-
-                          <div style={{ position: "relative" }}>
-                            <button
-                              type="button"
-                              onClick={() => setNotifyOpenId((prev) => (prev === order.id ? null : order.id))}
-                              style={actionButtonStyle}
-                              disabled={!template || savingId === order.id}
-                            >
-                              Notify Customer 🔔
-                            </button>
-                            {notifyOpenId === order.id && template && (
-                              <div
-                                style={{
-                                  position: "absolute",
-                                  top: "calc(100% + 6px)",
-                                  left: 0,
-                                  minWidth: "180px",
-                                  background: CARD,
-                                  border: `1px solid ${BORDER}`,
-                                  borderRadius: "10px",
-                                  boxShadow: "0 10px 24px rgba(0,0,0,0.25)",
-                                  zIndex: 10,
-                                  padding: "6px",
-                                }}
-                              >
-                                <button
-                                  type="button"
-                                  onClick={() => sendNotification(order)}
-                                  style={{
-                                    width: "100%",
-                                    textAlign: "left",
-                                    border: "none",
-                                    background: "transparent",
-                                    color: CREAM,
-                                    padding: "8px",
-                                    borderRadius: "8px",
-                                    cursor: "pointer",
-                                    fontSize: "12px",
-                                    fontWeight: 700,
-                                  }}
-                                >
-                                  {template}
-                                </button>
-                              </div>
-                            )}
-                          </div>
                         </div>
                       </td>
                     </tr>
@@ -616,3 +508,4 @@ export default function AdminOrdersPage() {
     </>
   );
 }
+

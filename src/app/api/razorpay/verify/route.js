@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { PrismaClient } from "@prisma/client";
+import { createOrderWithNotifications, OrderValidationError } from "../../../../controllers/orderController";
 
 const prisma = new PrismaClient();
 
@@ -17,33 +18,12 @@ export async function POST(req) {
     const isMatch = expectedSignature === razorpay_signature;
 
     if (isMatch) {
-      // 1. Upsert User
-      const user = await prisma.user.upsert({
-        where: { email: orderDetails.userEmail },
-        update: { name: orderDetails.userName },
-        create: { 
-          id: orderDetails.userId, // Use Supabase ID
-          email: orderDetails.userEmail, 
-          name: orderDetails.userName 
-        },
-      });
-
-      // 2. Create Order
-      const order = await prisma.order.create({
-        data: {
-          userId: user.id,
-          total: orderDetails.total,
-          address: orderDetails.address,
-          paymentMethod: "RAZORPAY",
-          status: "confirmed",
-          items: {
-            create: orderDetails.items.map(i => ({
-              productId: i.id,
-              qty: i.qty,
-              price: i.price
-            }))
-          }
-        }
+      const order = await createOrderWithNotifications({
+        prisma,
+        orderDetails,
+        paymentMethod: "RAZORPAY",
+        paymentId: razorpay_payment_id,
+        status: "pending",
       });
 
       return NextResponse.json({ verified: true, orderId: order.id });
@@ -52,10 +32,12 @@ export async function POST(req) {
     }
   } catch (err) {
     console.error("Verification failed:", err);
+    if (err instanceof OrderValidationError) {
+      return NextResponse.json({ error: err.message }, { status: 400 });
+    }
     return NextResponse.json(
       { error: "Verification failed" },
       { status: 500 }
     );
   }
 }
-
