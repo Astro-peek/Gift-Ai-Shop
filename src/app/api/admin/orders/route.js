@@ -7,6 +7,8 @@ import { notifyOrderStatusUpdated } from "../../../../controllers/orderControlle
 const prisma = new PrismaClient();
 
 const LIFECYCLE = ["pending", "packed", "shipped", "delivered"];
+const ALLOWED_STATUSES = [...LIFECYCLE, "cancelled"];
+const TERMINAL_STATUSES = ["delivered", "cancelled"];
 const LEGACY_STATUS_MAP = {
   placed: "pending",
   confirmed: "packed",
@@ -52,7 +54,7 @@ export async function GET() {
 
 // PATCH — advance order status in fixed lifecycle, add trackingId / deliveryNote
 // Restrictions:
-//   - Cannot modify a "delivered" order
+//   - Cannot modify a "delivered" or "cancelled" order
 //   - Cannot go backward in the lifecycle
 //   - Cannot touch total, paymentMethod, paymentId, address, userId
 export async function PATCH(req) {
@@ -69,26 +71,37 @@ export async function PATCH(req) {
 
   const currentStatus = normalizeStatus(order.status);
 
-  // Block edits on completed orders
-  if (currentStatus === "delivered") {
+  // Block edits on terminal orders
+  if (TERMINAL_STATUSES.includes(currentStatus)) {
     return NextResponse.json({ error: "Completed orders cannot be modified" }, { status: 403 });
   }
 
   const data = {};
 
   if (status !== undefined) {
-    if (!LIFECYCLE.includes(status)) {
+    if (!ALLOWED_STATUSES.includes(status)) {
       return NextResponse.json(
-        { error: `Invalid status. Must be one of: ${LIFECYCLE.join(", ")}` },
+        { error: `Invalid status. Must be one of: ${ALLOWED_STATUSES.join(", ")}` },
         { status: 400 },
       );
     }
-    const currentIdx = LIFECYCLE.indexOf(currentStatus);
-    const newIdx = LIFECYCLE.indexOf(status);
-    if (newIdx < currentIdx) {
-      return NextResponse.json({ error: "Cannot move order backward in the lifecycle" }, { status: 400 });
+
+    if (status === "cancelled") {
+      data.status = status;
+    } else {
+      const currentIdx = LIFECYCLE.indexOf(currentStatus);
+      const newIdx = LIFECYCLE.indexOf(status);
+
+      if (currentIdx === -1 || newIdx === -1) {
+        return NextResponse.json({ error: `Cannot transition from status "${currentStatus}"` }, { status: 400 });
+      }
+
+      if (newIdx < currentIdx) {
+        return NextResponse.json({ error: "Cannot move order backward in the lifecycle" }, { status: 400 });
+      }
+
+      data.status = status;
     }
-    data.status = status;
   }
 
   if (trackingId !== undefined) data.trackingId = trackingId;

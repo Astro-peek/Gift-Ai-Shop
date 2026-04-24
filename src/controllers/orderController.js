@@ -1,11 +1,27 @@
 import { sendSMS } from "../utils/sendSMS";
 import { sendEmail } from "../utils/sendEmail";
+import { generateSMS } from "../utils/messageGenerator";
+import { generateOrderEmail } from "../utils/emailTemplate";
 
-const STATUS_TEMPLATE_MAP = {
-  pending: "ORDER_CONFIRMED",
-  packed: "ORDER_PACKED",
-  shipped: "ORDER_SHIPPED",
-  delivered: "ORDER_DELIVERED",
+const TEMPLATE_BY_TYPE = {
+  PLACED: "ORDER_CONFIRMED",
+  SHIPPED: "ORDER_SHIPPED",
+  DELIVERED: "ORDER_DELIVERED",
+  CANCELLED: "ORDER_CANCELLED",
+};
+
+const SUBJECT_BY_TYPE = {
+  PLACED: "Order Confirmed 🎉",
+  SHIPPED: "Your Order is on the way 🚚",
+  DELIVERED: "Order Delivered 🎉",
+  CANCELLED: "Order Cancelled",
+};
+
+const TYPE_BY_STATUS = {
+  pending: "PLACED",
+  shipped: "SHIPPED",
+  delivered: "DELIVERED",
+  cancelled: "CANCELLED",
 };
 
 export class OrderValidationError extends Error {
@@ -23,54 +39,24 @@ function extractPhone(orderDetails = {}) {
   return match ? match[1].trim() : "";
 }
 
-function toTitleCase(value) {
-  return String(value || "")
-    .replace(/[_-]/g, " ")
-    .split(" ")
-    .filter(Boolean)
-    .map((word) => word[0].toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
+function getCustomerName(order) {
+  const fromName = String(order?.user?.name || "").trim();
+  if (fromName) return fromName;
+
+  const email = String(order?.user?.email || "").trim();
+  if (!email) return "Customer";
+  return email.split("@")[0] || "Customer";
 }
 
-function formatItemsForEmail(order) {
-  if (!Array.isArray(order?.items) || order.items.length === 0) {
-    return "- No items available";
-  }
-
-  return order.items
-    .map((item) => {
-      const name = item.product?.name || item.name || `Product #${item.productId || "N/A"}`;
-      const qty = Number(item.qty || 1);
-      const price = Number(item.price || 0);
-      return `- ${name} x${qty} - INR ${price.toLocaleString("en-IN")}`;
-    })
-    .join("\n");
+function getStatusType(status) {
+  return TYPE_BY_STATUS[String(status || "").toLowerCase()] || null;
 }
 
-function orderConfirmationEmail(order) {
-  return [
-    "Your order has been placed successfully.",
-    "",
-    `Order ID: ${order.id}`,
-    "Items:",
-    formatItemsForEmail(order),
-    `Total price: INR ${Number(order.total || 0).toLocaleString("en-IN")}`,
-  ].join("\n");
-}
+async function saveInternalNotification(prisma, { orderId, userId, type, message }) {
+  if (!userId || !type) return;
 
-function orderStatusEmail(order, status) {
-  return [
-    "Your order status has been updated.",
-    "",
-    `Order ID: ${order.id}`,
-    `Updated Status: ${toTitleCase(status)}`,
-  ].join("\n");
-}
-
-async function saveInternalNotification(prisma, { orderId, userId, status, message }) {
-  if (!userId) return;
-
-  const template = STATUS_TEMPLATE_MAP[String(status || "").toLowerCase()] || "ORDER_CONFIRMED";
+  const template = TEMPLATE_BY_TYPE[type];
+  if (!template) return;
 
   try {
     await prisma.notification.create({
@@ -84,6 +70,41 @@ async function saveInternalNotification(prisma, { orderId, userId, status, messa
   } catch (error) {
     console.error("Internal notification log failed:", error);
   }
+}
+
+async function dispatchOrderNotifications({ prisma, order, type }) {
+  if (!type || !SUBJECT_BY_TYPE[type]) {
+    return;
+  }
+
+  const name = getCustomerName(order);
+  const smsMessage = generateSMS(type, name, order.id, order.total);
+  const emailHtml = generateOrderEmail({
+    name,
+    orderId: order.id,
+    total: order.total,
+    status: type,
+  });
+  const emailSubject = SUBJECT_BY_TYPE[type];
+
+  try {
+    await sendSMS(order.user?.phone, smsMessage);
+  } catch (error) {
+    console.error("SMS notification failed:", error);
+  }
+
+  try {
+    await sendEmail(order.user?.email, emailSubject, emailHtml);
+  } catch (error) {
+    console.error("Email notification failed:", error);
+  }
+
+  await saveInternalNotification(prisma, {
+    orderId: order.id,
+    userId: order.userId,
+    type,
+    message: smsMessage,
+  });
 }
 
 function normalizeOrderInput(orderDetails = {}) {
@@ -141,49 +162,19 @@ function normalizeOrderInput(orderDetails = {}) {
 }
 
 export async function notifyOrderCreated({ prisma, order }) {
-  const smsMessage = `Thank you for shopping with us. Your order ${order.id} has been placed.`;
-
-  await Promise.allSettled([
-    sendSMS({
-      to: order.user?.phone,
-      message: smsMessage,
-    }),
-    sendEmail({
-      to: order.user?.email,
-      subject: "Order Confirmation",
-      text: orderConfirmationEmail(order),
-    }),
-  ]);
-
-  await saveInternalNotification(prisma, {
-    orderId: order.id,
-    userId: order.userId,
-    status: order.status,
-    message: smsMessage,
+  await dispatchOrderNotifications({
+    prisma,
+    order,
+    type: "PLACED",
   });
 }
 
 export async function notifyOrderStatusUpdated({ prisma, order, status }) {
-  const nextStatus = String(status || order.status || "").toLowerCase();
-  const smsMessage = `Your order ${order.id} is now ${toTitleCase(nextStatus)}`;
-
-  await Promise.allSettled([
-    sendSMS({
-      to: order.user?.phone,
-      message: smsMessage,
-    }),
-    sendEmail({
-      to: order.user?.email,
-      subject: "Order Update",
-      text: orderStatusEmail(order, nextStatus),
-    }),
-  ]);
-
-  await saveInternalNotification(prisma, {
-    orderId: order.id,
-    userId: order.userId,
-    status: nextStatus,
-    message: smsMessage,
+  const type = getStatusType(status || order.status);
+  await dispatchOrderNotifications({
+    prisma,
+    order,
+    type,
   });
 }
 
@@ -242,3 +233,4 @@ export async function createOrderWithNotifications({
 
   return order;
 }
+

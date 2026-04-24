@@ -29,8 +29,17 @@ function normalizePhone(phone) {
   return `+${digits}`;
 }
 
-export async function sendSMS({ to, message }) {
+export async function sendSMS(toOrPayload, maybeMessage) {
   try {
+    const to =
+      typeof toOrPayload === "object" && toOrPayload !== null
+        ? toOrPayload.to
+        : toOrPayload;
+    const message =
+      typeof toOrPayload === "object" && toOrPayload !== null
+        ? toOrPayload.message
+        : maybeMessage;
+
     const from = process.env.TWILIO_PHONE;
     const client = getTwilioClient();
     const normalizedTo = normalizePhone(to);

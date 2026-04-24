@@ -22,8 +22,21 @@ function getTransporter() {
   return transporter;
 }
 
-export async function sendEmail({ to, subject, text }) {
+export async function sendEmail(toOrPayload, maybeSubject, maybeHtml) {
   try {
+    const to =
+      typeof toOrPayload === "object" && toOrPayload !== null
+        ? toOrPayload.to
+        : toOrPayload;
+    const subject =
+      typeof toOrPayload === "object" && toOrPayload !== null
+        ? toOrPayload.subject
+        : maybeSubject;
+    const html =
+      typeof toOrPayload === "object" && toOrPayload !== null
+        ? toOrPayload.html
+        : maybeHtml;
+
     const from = process.env.EMAIL_USER;
     const smtp = getTransporter();
 
@@ -37,7 +50,7 @@ export async function sendEmail({ to, subject, text }) {
       return { success: false, skipped: true };
     }
 
-    if (!subject || !text) {
+    if (!subject || !html) {
       console.error("Email skipped: Missing subject or body");
       return { success: false, skipped: true };
     }
@@ -46,7 +59,7 @@ export async function sendEmail({ to, subject, text }) {
       from,
       to,
       subject,
-      text,
+      html,
     });
 
     return { success: true };
