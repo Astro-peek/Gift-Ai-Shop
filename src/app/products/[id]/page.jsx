@@ -4,6 +4,22 @@ import { useParams } from "next/navigation";
 
 const GOLD = "#C9A84C", DARK = "#0A0804", SURFACE = "#13110C", CARD = "#1A1710", BORDER = "#2E2A1E", MUTED = "#6B6248";
 
+// Working 3D models from Khronos glTF samples and GitHub CDN
+const AR_MODELS = {
+  "Luxury Fashion": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb", ios: null, color: "#C9A84C" },
+  "Home & Lifestyle": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/FlightHelmet/glTF/FlightHelmet.gltf", ios: null, color: "#52b788" },
+  "Premium Tech": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb", ios: null, color: "#7ab8f5" },
+  "Stationery": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf", ios: null, color: "#e87fa8" },
+  "Wellness": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Lantern/glTF/Lantern.gltf", ios: null, color: "#9b91ff" },
+  "Botanicals": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BrainStem/glTF/BrainStem.gltf", ios: null, color: "#52b788" },
+  "Gourmet Food": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxTextured/glTF/BoxTextured.gltf", ios: null, color: "#e87fa8" },
+  "Fine Accessories": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb", ios: null, color: "#C9A84C" },
+  "Memories": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxTextured/glTF/BoxTextured.gltf", ios: null, color: "#e87fa8" },
+  "Games & Leisure": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BrainStem/glTF/BrainStem.gltf", ios: null, color: "#7ab8f5" },
+  "Creative Arts": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BrainStem/glTF/BrainStem.gltf", ios: null, color: "#9b91ff" },
+  "default": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb", ios: null, color: "#C9A84C" }
+};
+
 const PRODUCTS = [
   { id:1, name:"Hermès-Style Silk Scarf", price:3499, category:"Luxury Fashion", tags:["women","luxury","anniversary"], rating:4.9, reviews:312, image:"https://images.unsplash.com/photo-1601924994987-69e26d50dc26?w=800&q=90", badge:"Bestseller", desc:"Hand-rolled edges, 100% pure silk. Arrives in our signature gift box with satin ribbon. A timeless declaration of elegance — she'll drape herself in your affection every day.", stock:50, arSrc:null, longDesc:"Crafted from 100% pure, Grade A habotai silk, this scarf is a tribute to the art of luxury gifting. Each edge is hand-rolled by artisans in a 3-day process. The pattern is printed using eco-certified dyes that retain vibrancy wash after wash. Ships in our signature black gift box with gold satin ribbon and a personalized gift note card." },
   { id:2, name:"Japanese Cast Iron Tea Set", price:4299, category:"Home & Lifestyle", tags:["parents","home","birthday"], rating:4.8, reviews:178, image:"https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=800&q=90", badge:"Top Rated", desc:"Authentic tetsubin design with 4 cups. Keeps tea perfectly hot for 2+ hours.", stock:25, arSrc:null, longDesc:"Forged using traditional Japanese casting techniques, this tetsubin (cast iron teapot) retains heat for over 2 hours. Set includes the teapot, 4 cast iron cups, a bamboo tray, and a mini strainer. The interior is enamel-coated to prevent rust. A morning ritual elevated to an art form." },
@@ -99,9 +115,76 @@ export default function ProductDetailPage() {
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet"/>
       {/* model-viewer for AR */}
       <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+      
+      {/* AR Animations & Mobile Responsive Styles */}
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        model-viewer {
+          --poster-color: transparent;
+        }
+        model-viewer::part(default-ar-button) {
+          display: none;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+          .product-grid-layout {
+            grid-template-columns: 1fr !important;
+            gap: 32px !important;
+          }
+          .main-image-container {
+            height: 350px !important;
+          }
+          .thumbnail-strip {
+            overflow-x: auto !important;
+            flex-wrap: nowrap !important;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 8px;
+          }
+          .thumbnail-strip > div {
+            flex-shrink: 0;
+          }
+          .ar-panel {
+            padding: 16px !important;
+          }
+          .ar-panel model-viewer {
+            height: 250px !important;
+          }
+          .nav-padding {
+            padding: 0 1rem !important;
+          }
+          .content-padding {
+            padding: 40px 1rem 60px !important;
+          }
+          .price-text {
+            font-size: 32px !important;
+          }
+          .cta-buttons {
+            flex-direction: column !important;
+          }
+          .cta-buttons a {
+            justify-content: center;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .main-image-container {
+            height: 280px !important;
+          }
+          .ar-panel model-viewer {
+            height: 200px !important;
+          }
+          .price-text {
+            font-size: 28px !important;
+          }
+        }
+      `}</style>
 
       {/* NAV */}
-      <nav style={{ background: SURFACE, borderBottom: `1px solid ${BORDER}`, padding: "0 3rem", display: "flex", alignItems: "center", gap: "20px", height: "68px" }}>
+      <nav className="nav-padding" style={{ background: SURFACE, borderBottom: `1px solid ${BORDER}`, padding: "0 3rem", display: "flex", alignItems: "center", gap: "20px", height: "68px" }}>
         <a href="/" style={{ color: MUTED, textDecoration: "none", fontSize: "13px", display: "flex", alignItems: "center", gap: "6px" }}>← Shop</a>
         <span style={{ color: BORDER }}>·</span>
         <span style={{ color: MUTED, fontSize: "13px" }}>{product.category}</span>
@@ -109,18 +192,18 @@ export default function ProductDetailPage() {
         <span style={{ color: "#F0EAD6", fontSize: "13px", fontWeight: 600 }}>{product.name}</span>
       </nav>
 
-      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "60px 2rem 100px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "60px", alignItems: "start" }}>
+      <div className="content-padding" style={{ maxWidth: "1100px", margin: "0 auto", padding: "60px 2rem 100px" }}>
+        <div className="product-grid-layout" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "60px", alignItems: "start" }}>
 
           {/* IMAGE PANEL */}
           <div>
-            <div style={{ borderRadius: "20px", overflow: "hidden", background: SURFACE, border: `1px solid ${BORDER}`, height: "480px", position: "relative" }}>
+            <div className="main-image-container" style={{ borderRadius: "20px", overflow: "hidden", background: SURFACE, border: `1px solid ${BORDER}`, height: "480px", position: "relative" }}>
               <img src={images[activeImg]} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
               {product.badge && <div style={{ position: "absolute", top: "16px", left: "16px", background: bc[0], border: `1px solid ${bc[2]}`, color: bc[1], fontSize: "10px", fontWeight: 800, padding: "4px 14px", borderRadius: "40px", letterSpacing: "1.2px" }}>{product.badge.toUpperCase()}</div>}
               {product.stock < 15 && <div style={{ position: "absolute", bottom: "16px", right: "16px", background: "#e24b4a22", border: "1px solid #e24b4a44", color: "#e24b4a", fontSize: "11px", fontWeight: 700, padding: "4px 12px", borderRadius: "20px" }}>Only {product.stock} left</div>}
             </div>
             {/* Thumbnail strip */}
-            <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
+            <div className="thumbnail-strip" style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
               {images.map((img, i) => (
                 <div key={i} onClick={() => setActiveImg(i)} style={{ width: "80px", height: "80px", borderRadius: "10px", overflow: "hidden", cursor: "pointer", border: `2px solid ${i === activeImg ? GOLD : BORDER}`, opacity: i === activeImg ? 1 : 0.6, transition: "all 0.2s" }}>
                   <img src={img} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
@@ -134,31 +217,113 @@ export default function ProductDetailPage() {
             </div>
             {/* AR Viewer Panel */}
             {showAR && (
-              <div style={{ marginTop: "16px", background: CARD, border: `1px solid ${GOLD}33`, borderRadius: "16px", padding: "24px", textAlign: "center" }}>
-                <div style={{ fontSize: "11px", color: GOLD, fontWeight: 800, letterSpacing: "1.5px", marginBottom: "12px" }}>✦ AR PREVIEW MODE</div>
-                {/* model-viewer — works with real .glb/.usdz files */}
-                <model-viewer
-                  src="https://modelviewer.dev/shared-assets/models/Astronaut.glb" /* Sample model for demo */
-                  ios-src=""
-                  ar
-                  ar-modes="webxr scene-viewer quick-look"
-                  camera-controls
-                  auto-rotate
-                  poster={product.image}
-                  style={{ width: "100%", height: "280px", borderRadius: "12px", background: SURFACE }}
-                >
-                  <div slot="poster" style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "12px" }}>
-                    <img src={product.image} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "12px", opacity: 0.6 }}/>
-                    <div style={{ position: "absolute", textAlign: "center" }}>
-                      <div style={{ fontSize: "28px", marginBottom: "8px" }}>🪄</div>
-                      <div style={{ color: "#F0EAD6", fontWeight: 700, fontSize: "14px" }}>Tap to view in AR</div>
-                      <div style={{ color: MUTED, fontSize: "12px", marginTop: "4px" }}>Requires iOS 12+ or Android 8+</div>
+              <div className="ar-panel" style={{ marginTop: "16px", background: CARD, border: `1px solid ${GOLD}33`, borderRadius: "16px", padding: "20px", textAlign: "center" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginBottom: "16px" }}>
+                  <span style={{ fontSize: "14px" }}>✦</span>
+                  <span style={{ fontSize: "11px", color: GOLD, fontWeight: 800, letterSpacing: "1.5px" }}>AR PREVIEW MODE</span>
+                  <span style={{ fontSize: "14px" }}>✦</span>
+                </div>
+                
+                {/* model-viewer container */}
+                <div style={{ position: "relative", borderRadius: "12px", overflow: "hidden", background: SURFACE }}>
+                  <model-viewer
+                    src={AR_MODELS[product.category]?.src || AR_MODELS.default.src}
+                    ios-src={AR_MODELS[product.category]?.ios || ""}
+                    alt={`3D preview of ${product.name}`}
+                    ar
+                    ar-modes="webxr scene-viewer quick-look"
+                    camera-controls
+                    auto-rotate
+                    auto-rotate-delay="0"
+                    rotation-per-second="30deg"
+                    exposure="1.0"
+                    shadow-intensity="1.0"
+                    environment-image="neutral"
+                    interaction-prompt="none"
+                    loading="eager"
+                    reveal="auto"
+                    style={{ width: "100%", height: "300px", background: SURFACE }}
+                  >
+                    {/* Poster slot */}
+                    <div slot="poster" style={{ width: "100%", height: "300px", background: `linear-gradient(135deg, ${SURFACE} 0%, ${CARD} 100%)`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                      <div style={{ 
+                        width: "80px", 
+                        height: "80px", 
+                        borderRadius: "50%", 
+                        background: `linear-gradient(135deg, ${AR_MODELS[product.category]?.color || GOLD}20, ${AR_MODELS[product.category]?.color || GOLD}40)`,
+                        display: "flex", 
+                        alignItems: "center", 
+                        justifyContent: "center",
+                        marginBottom: "16px",
+                        animation: "pulse 2s infinite"
+                      }}>
+                        <span style={{ fontSize: "36px" }}>🎁</span>
+                      </div>
+                      <div style={{ color: GOLD, fontWeight: 700, fontSize: "14px", marginBottom: "4px" }}>Loading 3D Preview...</div>
+                      <div style={{ color: MUTED, fontSize: "12px" }}>{product.category}</div>
                     </div>
-                  </div>
-                </model-viewer>
-                <p style={{ color: MUTED, fontSize: "12px", marginTop: "12px", lineHeight: 1.6 }}>
-                  Point your camera at a flat surface to see this gift in your space. Available on iOS 12+ and Android with ARCore.
+                    
+                    {/* AR Button - positioned inside the viewer */}
+                    <button slot="ar-button" style={{ 
+                      position: "absolute", 
+                      bottom: "16px", 
+                      right: "16px", 
+                      background: GOLD, 
+                      color: DARK, 
+                      border: "none", 
+                      borderRadius: "8px", 
+                      padding: "10px 16px", 
+                      fontWeight: 700, 
+                      fontSize: "12px", 
+                      cursor: "pointer", 
+                      display: "flex", 
+                      alignItems: "center", 
+                      gap: "6px",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
+                    }}>
+                      <span>📱</span> View in AR
+                    </button>
+                  </model-viewer>
+                </div>
+                
+                {/* Instructions */}
+                <p style={{ color: MUTED, fontSize: "12px", marginTop: "16px", lineHeight: 1.6 }}>
+                  <strong style={{ color: GOLD }}>Tap "View in AR"</strong> to place this item in your space. Works on iOS 12+ and Android with ARCore.
                 </p>
+                
+                {/* Tech badges */}
+                <div style={{ display: "flex", gap: "8px", justifyContent: "center", marginTop: "12px", flexWrap: "wrap" }}>
+                  {["WebXR", "ARCore", "Quick Look"].map((tech) => (
+                    <span key={tech} style={{ 
+                      padding: "4px 12px", 
+                      background: `${GOLD}15`, 
+                      border: `1px solid ${GOLD}30`, 
+                      borderRadius: "20px", 
+                      fontSize: "10px", 
+                      color: GOLD, 
+                      fontWeight: 600,
+                      letterSpacing: "0.5px"
+                    }}>{tech}</span>
+                  ))}
+                </div>
+                
+                {/* Manual close button */}
+                <button 
+                  onClick={() => setShowAR(false)}
+                  style={{ 
+                    marginTop: "16px",
+                    padding: "8px 16px",
+                    background: "transparent",
+                    border: `1px solid ${BORDER}`,
+                    borderRadius: "6px",
+                    color: MUTED,
+                    fontSize: "12px",
+                    cursor: "pointer",
+                    fontFamily: "'Nunito',sans-serif"
+                  }}
+                >
+                  Close AR Preview
+                </button>
               </div>
             )}
           </div>
@@ -174,7 +339,7 @@ export default function ProductDetailPage() {
               <span style={{ color: MUTED, fontSize: "13px" }}>{product.rating} · {product.reviews.toLocaleString()} reviews</span>
             </div>
 
-            <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "42px", fontWeight: 700, color: GOLD, marginBottom: "24px" }}>₹{product.price.toLocaleString()}</div>
+            <div className="price-text" style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "42px", fontWeight: 700, color: GOLD, marginBottom: "24px" }}>₹{product.price.toLocaleString()}</div>
 
             <p style={{ color: "#c8bfa6", fontSize: "15px", lineHeight: 1.75, marginBottom: "28px", fontWeight: 300 }}>{product.longDesc}</p>
 
@@ -194,7 +359,7 @@ export default function ProductDetailPage() {
             </div>
 
             {/* CTA */}
-            <div style={{ display: "flex", gap: "12px", marginBottom: "28px" }}>
+            <div className="cta-buttons" style={{ display: "flex", gap: "12px", marginBottom: "28px" }}>
               <button onClick={addToCart} id="add-to-cart-btn"
                 style={{ flex: 1, background: cartAdded ? "#52b788" : GOLD, border: "none", borderRadius: "12px", padding: "16px", fontFamily: "'Nunito',sans-serif", fontWeight: 800, fontSize: "15px", cursor: "pointer", color: DARK, letterSpacing: "0.5px", transition: "background 0.3s" }}>
                 {cartAdded ? "✓ Added!" : `Add to Cart — ₹${(product.price * qty).toLocaleString()}`}
