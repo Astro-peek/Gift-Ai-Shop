@@ -131,22 +131,24 @@ export default function ProductDetailPage() {
           display: none;
         }
         
-        /* AR Launch Button */
+        /* AR Launch Button - from model-viewer slot */
         .ar-launch-btn {
           background: #C9A84C;
           color: #0A0804;
           border: none;
           border-radius: 8px;
-          padding: 12px 24px;
+          padding: 12px 20px;
           font-weight: 800;
           font-size: 14px;
           cursor: pointer;
           font-family: 'Nunito', sans-serif;
-          position: absolute;
-          bottom: 16px;
-          right: 16px;
-          z-index: 10;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+          margin-bottom: 10px;
+        }
+        
+        /* When AR is supported, show the slot button and hide fallback */
+        model-viewer[ar-status="supported"] ~ #fallback-ar-btn,
+        model-viewer[ar-status="not-presenting"] ~ #fallback-ar-btn {
+          display: none !important;
         }
         
         /* Mobile Responsive */
@@ -239,12 +241,13 @@ export default function ProductDetailPage() {
             {showAR && (
               <div className="ar-panel" style={{ marginTop: "16px", background: CARD, border: `1px solid ${GOLD}33`, borderRadius: "16px", padding: "16px", textAlign: "center" }}>
                 <div style={{ fontSize: "11px", color: GOLD, fontWeight: 800, letterSpacing: "1.5px", marginBottom: "12px" }}>
-                  ✦ AR PREVIEW MODE ✦
+                  ✦ 3D / AR PREVIEW ✦
                 </div>
                 
-                {/* 3D Viewer - Fixed for Mobile AR */}
+                {/* 3D Viewer - Works on ALL devices */}
                 <div style={{ borderRadius: "12px", overflow: "hidden", background: SURFACE, position: "relative" }}>
                   <model-viewer
+                    id="ar-model"
                     src={AR_MODEL_URL}
                     ar
                     ar-modes="webxr scene-viewer quick-look"
@@ -252,27 +255,57 @@ export default function ProductDetailPage() {
                     auto-rotate
                     shadow-intensity="1"
                     exposure="1"
+                    alt="3D Product Preview"
                     style={{ width: "100%", height: "280px", background: SURFACE }}
                   >
-                    <button 
-                      slot="ar-button" 
-                      className="ar-launch-btn"
-                    >
+                    {/* This button only shows if AR is supported */}
+                    <button slot="ar-button" className="ar-launch-btn">
                       📱 Launch AR
                     </button>
                   </model-viewer>
+                  
+                  {/* Fallback button for non-AR devices */}
+                  <button 
+                    id="fallback-ar-btn"
+                    onClick={() => {
+                      const viewer = document.getElementById('ar-model');
+                      if (viewer && viewer.activateAR) {
+                        viewer.activateAR();
+                      } else {
+                        alert('AR requires:\n• iPhone/iPad with iOS 12+\n• Android with ARCore\n\nOn desktop: Click and drag to rotate the 3D model');
+                      }
+                    }}
+                    style={{ 
+                      position: "absolute",
+                      bottom: "16px",
+                      right: "16px",
+                      background: GOLD,
+                      color: DARK,
+                      border: "none",
+                      borderRadius: "8px",
+                      padding: "12px 20px",
+                      fontWeight: 800,
+                      fontSize: "13px",
+                      cursor: "pointer",
+                      fontFamily: "'Nunito',sans-serif",
+                      zIndex: 100,
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.4)"
+                    }}
+                  >
+                    🥽 Try AR
+                  </button>
                 </div>
                 
-                <p style={{ color: MUTED, fontSize: "12px", marginTop: "12px", lineHeight: 1.5 }}>
-                  Tap the button above to launch AR. <br/>
-                  <span style={{ fontSize: "11px" }}>Requires iOS 12+ or Android with ARCore</span>
+                <p style={{ color: MUTED, fontSize: "11px", marginTop: "12px", lineHeight: 1.5 }}>
+                  <strong style={{ color: GOLD }}>📱 Mobile:</strong> Tap "Try AR" to place in your room<br/>
+                  <strong style={{ color: GOLD }}>💻 Desktop:</strong> Click & drag to rotate 3D model
                 </p>
                 
                 <button 
                   onClick={() => setShowAR(false)}
                   style={{ 
                     marginTop: "12px",
-                    padding: "8px 16px",
+                    padding: "8px 20px",
                     background: "transparent",
                     border: `1px solid ${BORDER}`,
                     borderRadius: "6px",
@@ -282,7 +315,7 @@ export default function ProductDetailPage() {
                     fontFamily: "'Nunito',sans-serif"
                   }}
                 >
-                  Close Preview
+                  Close
                 </button>
               </div>
             )}
