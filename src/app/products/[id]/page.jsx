@@ -131,24 +131,61 @@ export default function ProductDetailPage() {
           display: none;
         }
         
-        /* AR Launch Button - from model-viewer slot */
+        /* AR Launch Button - inside model-viewer */
         .ar-launch-btn {
           background: #C9A84C;
           color: #0A0804;
           border: none;
+          border-radius: 10px;
+          padding: 14px 24px;
+          font-weight: 800;
+          font-size: 15px;
+          cursor: pointer;
+          font-family: 'Nunito', sans-serif;
+          position: absolute;
+          bottom: 16px;
+          right: 16px;
+          z-index: 10;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+          transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .ar-launch-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+        }
+        
+        /* AR Action Buttons Row */
+        .ar-action-btn {
+          background: #C9A84C;
+          color: #0A0804;
+          border: none;
           border-radius: 8px;
-          padding: 12px 20px;
+          padding: 12px 24px;
           font-weight: 800;
           font-size: 14px;
           cursor: pointer;
           font-family: 'Nunito', sans-serif;
-          margin-bottom: 10px;
+          transition: all 0.2s;
         }
-        
-        /* When AR is supported, show the slot button and hide fallback */
-        model-viewer[ar-status="supported"] ~ #fallback-ar-btn,
-        model-viewer[ar-status="not-presenting"] ~ #fallback-ar-btn {
-          display: none !important;
+        .ar-action-btn:hover {
+          background: #d4b55c;
+          transform: translateY(-1px);
+        }
+        .ar-close-btn {
+          background: transparent;
+          color: #6B6248;
+          border: 1px solid #2E2A1E;
+          border-radius: 8px;
+          padding: 12px 24px;
+          font-weight: 700;
+          font-size: 14px;
+          cursor: pointer;
+          font-family: 'Nunito', sans-serif;
+          transition: all 0.2s;
+        }
+        .ar-close-btn:hover {
+          background: #1A1710;
+          color: #F0EAD6;
         }
         
         /* Mobile Responsive */
@@ -244,7 +281,7 @@ export default function ProductDetailPage() {
                   ✦ 3D / AR PREVIEW ✦
                 </div>
                 
-                {/* 3D Viewer - Works on ALL devices */}
+                {/* 3D Viewer Container */}
                 <div style={{ borderRadius: "12px", overflow: "hidden", background: SURFACE, position: "relative" }}>
                   <model-viewer
                     id="ar-model"
@@ -258,65 +295,39 @@ export default function ProductDetailPage() {
                     alt="3D Product Preview"
                     style={{ width: "100%", height: "280px", background: SURFACE }}
                   >
-                    {/* This button only shows if AR is supported */}
+                    {/* AR Button - built into model-viewer */}
                     <button slot="ar-button" className="ar-launch-btn">
                       📱 Launch AR
                     </button>
                   </model-viewer>
-                  
-                  {/* Fallback button for non-AR devices */}
+                </div>
+                
+                {/* Action Buttons Row */}
+                <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "12px", flexWrap: "wrap" }}>
                   <button 
-                    id="fallback-ar-btn"
+                    className="ar-action-btn"
                     onClick={() => {
                       const viewer = document.getElementById('ar-model');
                       if (viewer && viewer.activateAR) {
                         viewer.activateAR();
                       } else {
-                        alert('AR requires:\n• iPhone/iPad with iOS 12+\n• Android with ARCore\n\nOn desktop: Click and drag to rotate the 3D model');
+                        alert('AR requires:\n• iPhone/iPad with iOS 12+\n• Android with ARCore\n\nOn desktop: Click & drag to rotate');
                       }
                     }}
-                    style={{ 
-                      position: "absolute",
-                      bottom: "16px",
-                      right: "16px",
-                      background: GOLD,
-                      color: DARK,
-                      border: "none",
-                      borderRadius: "8px",
-                      padding: "12px 20px",
-                      fontWeight: 800,
-                      fontSize: "13px",
-                      cursor: "pointer",
-                      fontFamily: "'Nunito',sans-serif",
-                      zIndex: 100,
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.4)"
-                    }}
                   >
-                    🥽 Try AR
+                    🥽 View in AR
+                  </button>
+                  <button 
+                    className="ar-close-btn"
+                    onClick={() => setShowAR(false)}
+                  >
+                    ✕ Close
                   </button>
                 </div>
                 
-                <p style={{ color: MUTED, fontSize: "11px", marginTop: "12px", lineHeight: 1.5 }}>
-                  <strong style={{ color: GOLD }}>📱 Mobile:</strong> Tap "Try AR" to place in your room<br/>
-                  <strong style={{ color: GOLD }}>💻 Desktop:</strong> Click & drag to rotate 3D model
+                <p style={{ color: MUTED, fontSize: "10px", marginTop: "10px", lineHeight: 1.4 }}>
+                  📱 Mobile: Tap "View in AR" | 💻 Desktop: Click & drag to rotate
                 </p>
-                
-                <button 
-                  onClick={() => setShowAR(false)}
-                  style={{ 
-                    marginTop: "12px",
-                    padding: "8px 20px",
-                    background: "transparent",
-                    border: `1px solid ${BORDER}`,
-                    borderRadius: "6px",
-                    color: MUTED,
-                    fontSize: "12px",
-                    cursor: "pointer",
-                    fontFamily: "'Nunito',sans-serif"
-                  }}
-                >
-                  Close
-                </button>
               </div>
             )}
           </div>
