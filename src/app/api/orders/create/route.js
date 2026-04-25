@@ -10,7 +10,15 @@ if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 export async function POST(req) {
   try {
-    const { orderDetails } = await req.json();
+    const body = await req.json();
+    console.log("Order create request:", JSON.stringify(body, null, 2));
+    
+    const { orderDetails } = body;
+    if (!orderDetails) {
+      console.error("Missing orderDetails in request");
+      return NextResponse.json({ error: "orderDetails required" }, { status: 400 });
+    }
+    
     const order = await createOrderWithNotifications({
       prisma,
       orderDetails,

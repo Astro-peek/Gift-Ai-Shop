@@ -62,6 +62,20 @@ export default function CartPage() {
   const handleCOD = async () => {
     setPaying(true);
     try {
+      // Validate user data
+      if (!user || !user.id || !user.email) {
+        alert("Please log in to place an order");
+        setPaying(false);
+        return;
+      }
+      
+      // Validate address
+      if (!addr.street || !addr.city || !addr.state || !addr.pincode || !addr.phone) {
+        alert("Please fill in all address fields");
+        setPaying(false);
+        return;
+      }
+      
       const orderDetails = {
         userId: user.id,
         userEmail: user.email,
@@ -71,6 +85,8 @@ export default function CartPage() {
         paymentMethod: "COD",
         items: cart
       };
+      
+      console.log("Sending COD order:", orderDetails);
 
       const res = await fetch("/api/orders/create", {
         method: "POST",
