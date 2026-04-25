@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { createOrderWithNotifications, OrderValidationError } from "../../../../controllers/orderController";
 
+export const dynamic = "force-dynamic";
+
 const globalForPrisma = globalThis;
 const prisma = globalForPrisma.prisma || new PrismaClient();
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;

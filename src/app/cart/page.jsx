@@ -82,10 +82,13 @@ export default function CartPage() {
         setCart([]); // Clear cart
         setStep("success");
       } else {
-        alert("Failed to confirm order. Please try again.");
+        const errorData = await res.json().catch(() => ({}));
+        console.error("COD order failed:", errorData);
+        alert("Failed to confirm order: " + (errorData.error || errorData.details || "Please try again."));
       }
     } catch (err) {
-      console.error(err);
+      console.error("COD error:", err);
+      alert("Error: " + err.message);
     } finally {
       setPaying(false);
     }
