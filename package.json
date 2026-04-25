@@ -5,11 +5,12 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "prisma generate && next start",
     "db:push": "prisma db push",
     "db:seed": "node prisma/seed.js",
     "db:studio": "prisma studio",
-    "db:generate": "prisma generate"
+    "db:generate": "prisma generate",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

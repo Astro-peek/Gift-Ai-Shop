@@ -3,11 +3,21 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+export const dynamic = "force-dynamic";
+
+const globalForPrisma = globalThis;
+
+const prisma =
+  globalForPrisma.prisma || new PrismaClient();
+
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
+}
 
 export async function GET() {
   try {
     const supabase = createRouteHandlerClient({ cookies });
+
     const {
       data: { session },
     } = await supabase.auth.getSession();
@@ -22,12 +32,18 @@ export async function GET() {
     });
 
     if (!user || (user.role !== "ADMIN" && user.role !== "OWNER")) {
-      return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Admin access required" },
+        { status: 403 }
+      );
     }
 
     return NextResponse.json(user);
   } catch (err) {
     console.error("Admin check failed:", err);
-    return NextResponse.json({ error: "Failed to verify admin access" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to verify admin access" },
+      { status: 500 }
+    );
   }
 }
