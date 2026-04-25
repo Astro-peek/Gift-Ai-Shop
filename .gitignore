@@ -7,5 +7,6 @@ node_modules/
 prisma/generated/
 *.log
 .vercel
+.env.vercel
 coverage/
 env.download
