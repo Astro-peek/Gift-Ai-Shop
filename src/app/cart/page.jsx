@@ -196,7 +196,7 @@ export default function CartPage() {
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,700;1,400&family=Nunito:wght@300;600;700;800&display=swap" rel="stylesheet"/>
 
       {/* Nav */}
-      <nav style={{ background: SURFACE, borderBottom: `1px solid ${BORDER}`, padding: "0 3rem", display: "flex", alignItems: "center", justifyContent: "space-between", height: "68px" }}>
+      <nav className="cart-nav" style={{ background: SURFACE, borderBottom: `1px solid ${BORDER}`, padding: "0 3rem", display: "flex", alignItems: "center", justifyContent: "space-between", height: "68px" }}>
         <a href="/" style={{ textDecoration: "none" }}><Logo/></a>
         <div style={{ display: "flex", gap: "28px" }}>
           {["Cart", "Address", "Payment"].map((s, i) => (
@@ -208,11 +208,11 @@ export default function CartPage() {
         </div>
       </nav>
 
-      <div style={{ maxWidth: "960px", margin: "0 auto", padding: "48px 2rem" }}>
+      <div className="cart-container" style={{ maxWidth: "960px", margin: "0 auto", padding: "48px 2rem" }}>
 
         {/* ── CART STEP ── */}
         {step === "cart" && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "28px" }}>
+          <div className="cart-grid" style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "28px" }}>
             <div>
               <div style={{ marginBottom: "16px" }}>
                 <a href="/" style={{ color: MUTED, textDecoration: "none", fontSize: "14px", fontWeight: 700 }}>← Back to Shop</a>
@@ -228,7 +228,7 @@ export default function CartPage() {
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                   {cart.map(item => (
-                    <div key={item.id} style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: "14px", overflow: "hidden", display: "flex", alignItems: "stretch" }}>
+                    <div key={item.id} className="cart-item" style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: "14px", overflow: "hidden", display: "flex", alignItems: "stretch" }}>
                       <div style={{ width: "110px", minWidth: "110px", height: "110px", overflow: "hidden" }}>
                         {!imgErr[item.id] ? (
                           <img src={item.image} alt={item.name} onError={() => setImgErr(p => ({ ...p, [item.id]: true }))} style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
@@ -377,6 +377,29 @@ export default function CartPage() {
           </div>
         )}
       </div>
+      <style>{`
+        @media (max-width: 768px) {
+          .cart-nav { padding: 0 1rem !important; }
+          .cart-nav > div:last-child { display: none !important; }
+          .cart-container { padding: 24px 1rem !important; }
+          .cart-grid { 
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+          }
+          .cart-item {
+            flex-direction: column !important;
+          }
+          .cart-item > div:first-child {
+            width: 100% !important;
+            height: 200px !important;
+          }
+          .cart-item > div:last-child {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 12px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

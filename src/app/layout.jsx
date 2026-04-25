@@ -32,6 +32,28 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <style>{`
+          * { box-sizing: border-box; }
+          html { font-size: 16px; }
+          @media (max-width: 768px) {
+            html { font-size: 14px; }
+          }
+          body { 
+            margin: 0; 
+            padding: 0; 
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+          }
+          img { max-width: 100%; height: auto; }
+          button { touch-action: manipulation; }
+          input, select, textarea { font-size: 16px; }
+          @media (max-width: 768px) {
+            input, select, textarea { font-size: 16px; }
+          }
+        `}</style>
+      </head>
       <body style={{ margin: 0, padding: 0 }}>
         {children}
         <Script

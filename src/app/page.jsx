@@ -76,6 +76,7 @@ export default function HomePage() {
   const [productsLoading, setProductsLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [viewedCategories, setViewedCategories] = useState([]);
   const [featuredGifts, setFeaturedGifts] = useState([]);
   const chatEndRef = useRef(null);
@@ -213,13 +214,38 @@ export default function HomePage() {
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet"/>
 
       {/* NAV */}
-      <nav style={{ background:SURFACE, borderBottom:`1px solid ${BORDER}`, padding:"0 3rem", display:"flex", alignItems:"center", justifyContent:"space-between", height:"68px", position:"sticky", top:0, zIndex:100 }}>
+      <nav style={{ background:SURFACE, borderBottom:`1px solid ${BORDER}`, padding:"0 1rem", display:"flex", alignItems:"center", justifyContent:"space-between", height:"68px", position:"sticky", top:0, zIndex:100 }}>
         <Logo size={28}/>
-        <div style={{ display:"flex", gap:"2px" }}>
+        
+        {/* Desktop Navigation */}
+        <div style={{ display:"flex", gap:"2px" }} className="desktop-nav">
           {[["Home","/"],["Recommend","/recommend"],["Orders","/orders"],["Admin","/admin"]].map(([n, href]) => (
             <a key={n} href={href} style={{ color:MUTED, textDecoration:"none", padding:"7px 16px", borderRadius:"6px", fontSize:"13px", fontWeight:600, letterSpacing:"0.5px" }}>{n}</a>
           ))}
         </div>
+        
+        {/* Mobile Menu Button */}
+        <button 
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          style={{ 
+            display:"none", 
+            background:"none", 
+            border:"none", 
+            color:GOLD, 
+            cursor:"pointer",
+            padding:"8px"
+          }}
+          className="mobile-menu-btn"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            {mobileMenuOpen ? (
+              <><path d="M18 6L6 18M6 6l12 12"/></>
+            ) : (
+              <><path d="M3 12h18M3 6h18M3 18h18"/></>
+            )}
+          </svg>
+        </button>
+        
         <div style={{ display:"flex", alignItems:"center", gap:"20px" }}>
           <a href="/cart" style={{ textDecoration:"none", position:"relative" }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={GOLD} strokeWidth="1.6" strokeLinecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
@@ -254,9 +280,76 @@ export default function HomePage() {
           </div>
         </div>
       </nav>
+      
+      {/* Mobile Menu Dropdown */}
+      {mobileMenuOpen && (
+        <div style={{ 
+          display:"none",
+          position:"fixed", 
+          top:"68px", 
+          left:0, 
+          right:0, 
+          background:SURFACE, 
+          borderBottom:`1px solid ${BORDER}`,
+          zIndex:99,
+          padding:"1rem"
+        }} className="mobile-menu-dropdown">
+          {[["Home","/"],["Recommend","/recommend"],["Orders","/orders"],["Admin","/admin"]].map(([n, href]) => (
+            <a key={n} href={href} onClick={() => setMobileMenuOpen(false)} style={{ display:"block", color:MUTED, textDecoration:"none", padding:"12px 0", borderBottom:`1px solid ${BORDER}`, fontSize:"14px", fontWeight:600 }}>{n}</a>
+          ))}
+        </div>
+      )}
+      
+      <style>{`
+        @media (max-width: 768px) {
+          .desktop-nav { display: none !important; }
+          .mobile-menu-btn { display: block !important; }
+          .mobile-menu-dropdown { display: block !important; }
+          .hero-section { padding: 60px 1rem 40px !important; }
+          .hero-stats { 
+            gap: 24px !important; 
+            flex-wrap: wrap;
+            margin-top: 40px !important;
+          }
+          .hero-stats > div { flex: 1; min-width: 120px; }
+          .featured-section, .search-section, .products-section { 
+            padding-left: 1rem !important; 
+            padding-right: 1rem !important; 
+          }
+          .category-filters { 
+            overflow-x: auto !important;
+            flex-wrap: nowrap !important;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 8px;
+          }
+          .category-filters button { white-space: nowrap; }
+          .product-grid { grid-template-columns: 1fr !important; }
+          .section-divider { margin-left: 1rem !important; margin-right: 1rem !important; }
+          .chat-widget { 
+            width: 100% !important; 
+            height: 100% !important; 
+            bottom: 0 !important; 
+            right: 0 !important;
+            border-radius: 0 !important;
+          }
+          .toast { 
+            left: 1rem !important; 
+            right: 1rem !important; 
+            transform: none !important;
+          }
+        }
+        @media (min-width: 769px) {
+          .mobile-menu-btn { display: none !important; }
+          .mobile-menu-dropdown { display: none !important; }
+        }
+        @media (max-width: 480px) {
+          .hero-stats { gap: 16px !important; }
+          .hero-stats > div { min-width: 100px; }
+        }
+      `}</style>
 
       {/* HERO */}
-      <section style={{ textAlign:"center", padding:"100px 2rem 80px", position:"relative", overflow:"hidden" }}>
+      <section className="hero-section" style={{ textAlign:"center", padding:"100px 2rem 80px", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:"10%", left:"50%", transform:"translateX(-50%)", width:"700px", height:"350px", background:`radial-gradient(ellipse, ${GOLD}0F 0%, transparent 70%)`, pointerEvents:"none" }}/>
         <div style={{ position:"absolute", top:0, left:0, right:0, bottom:0, backgroundImage:`repeating-linear-gradient(0deg, transparent, transparent 60px, ${GOLD}05 60px, ${GOLD}05 61px), repeating-linear-gradient(90deg, transparent, transparent 60px, ${GOLD}05 60px, ${GOLD}05 61px)`, pointerEvents:"none" }}/>
         <div style={{ position:"relative" }}>
@@ -275,7 +368,7 @@ export default function HomePage() {
             <a href="/recommend" style={{ background:GOLD, color:DARK, padding:"15px 38px", borderRadius:"8px", fontWeight:800, fontSize:"14px", textDecoration:"none", letterSpacing:"0.8px" }}>Try Gift Recommender →</a>
             <button onClick={() => setChatOpen(true)} style={{ background:"transparent", border:`1px solid ${BORDER}`, color:"#F0EAD6", padding:"15px 38px", borderRadius:"8px", fontWeight:600, fontSize:"14px", cursor:"pointer", fontFamily:"'Nunito',sans-serif", letterSpacing:"0.5px" }}>Ask the Concierge</button>
           </div>
-          <div style={{ display:"flex", gap:"56px", justifyContent:"center", marginTop:"70px" }}>
+          <div className="hero-stats" style={{ display:"flex", gap:"56px", justifyContent:"center", marginTop:"70px" }}>
             {[["30+","Curated gifts"],["4.8★","Avg. rating"],["AI","Recommendations"],["Free","Gift wrapping"]].map(([v, l]) => (
               <div key={l} style={{ textAlign:"center" }}>
                 <div style={{ fontSize:"26px", fontWeight:700, color:GOLD, fontFamily:"'Cormorant Garamond',serif" }}>{v}</div>
@@ -288,7 +381,7 @@ export default function HomePage() {
 
       {/* PERSONALIZED FEATURED GIFTS (if viewed categories exist) */}
       {featuredGifts.length > 0 && featuredGifts.some(p => p.score > 0) && (
-        <section style={{ padding:"0 3rem 60px", maxWidth:"1320px", margin:"0 auto" }}>
+        <section className="featured-section" style={{ padding:"0 3rem 60px", maxWidth:"1320px", margin:"0 auto" }}>
           <div style={{ display:"flex", alignItems:"center", gap:"16px", marginBottom:"28px" }}>
             <div style={{ height:"1px", flex:1, background:`linear-gradient(to right, ${BORDER}, transparent)` }}/>
             <span style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"18px", color:GOLD, fontStyle:"italic", letterSpacing:"1px", whiteSpace:"nowrap" }}>Curated For You</span>
@@ -317,7 +410,7 @@ export default function HomePage() {
       )}
 
       {/* SEARCH + FILTERS */}
-      <section style={{ padding:"0 3rem 32px", maxWidth:"1320px", margin:"0 auto" }}>
+      <section className="search-section" style={{ padding:"0 3rem 32px", maxWidth:"1320px", margin:"0 auto" }}>
         <div style={{ display:"flex", gap:"10px", marginBottom:"16px" }}>
           <div style={{ flex:1, position:"relative" }}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2" style={{ position:"absolute", left:"15px", top:"50%", transform:"translateY(-50%)" }}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -327,7 +420,7 @@ export default function HomePage() {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
           </button>
         </div>
-        <div style={{ display:"flex", gap:"7px", flexWrap:"wrap" }}>
+        <div className="category-filters" style={{ display:"flex", gap:"7px", flexWrap:"wrap" }}>
           {CATEGORIES.map(c => (
             <button key={c} onClick={() => setCategory(c)} style={{ padding:"5px 14px", borderRadius:"40px", border:`1px solid ${category===c?GOLD:BORDER}`, background:category===c?`${GOLD}12`:"transparent", color:category===c?GOLD:MUTED, fontWeight:600, fontSize:"11px", cursor:"pointer", letterSpacing:"0.3px", fontFamily:"'Nunito',sans-serif" }}>{c}</button>
           ))}
@@ -335,15 +428,15 @@ export default function HomePage() {
       </section>
 
       {/* SECTION DIVIDER */}
-      <div style={{ maxWidth:"1320px", margin:"0 3rem 40px", display:"flex", alignItems:"center", gap:"16px" }}>
+      <div className="section-divider" style={{ maxWidth:"1320px", margin:"0 3rem 40px", display:"flex", alignItems:"center", gap:"16px" }}>
         <div style={{ height:"1px", flex:1, background:`linear-gradient(to right, ${BORDER}, transparent)` }}/>
         <span style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"18px", color:GOLD, fontStyle:"italic", letterSpacing:"1px", whiteSpace:"nowrap" }}>Curated Collection</span>
         <div style={{ height:"1px", flex:1, background:`linear-gradient(to left, ${BORDER}, transparent)` }}/>
       </div>
 
       {/* GRID — with skeleton loaders */}
-      <section style={{ padding:"0 3rem 100px", maxWidth:"1320px", margin:"0 auto" }}>
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:"22px" }}>
+      <section className="products-section" style={{ padding:"0 3rem 100px", maxWidth:"1320px", margin:"0 auto" }}>
+        <div className="product-grid" style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:"22px" }}>
           {productsLoading
             ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i}/>)
             : filtered.map(p => {
