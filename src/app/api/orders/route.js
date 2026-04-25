@@ -3,7 +3,11 @@ import { PrismaClient } from "@prisma/client";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 
-const prisma = new PrismaClient();
+export const dynamic = "force-dynamic";
+
+const globalForPrisma = globalThis;
+const prisma = globalForPrisma.prisma || new PrismaClient();
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 export async function GET(req) {
   const supabase = createRouteHandlerClient({ cookies });

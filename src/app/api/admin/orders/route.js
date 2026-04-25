@@ -4,7 +4,11 @@ import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { notifyOrderStatusUpdated } from "../../../../controllers/orderController";
 
-const prisma = new PrismaClient();
+export const dynamic = "force-dynamic";
+
+const globalForPrisma = globalThis;
+const prisma = globalForPrisma.prisma || new PrismaClient();
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 const LIFECYCLE = ["pending", "packed", "shipped", "delivered"];
 const ALLOWED_STATUSES = [...LIFECYCLE, "cancelled"];
