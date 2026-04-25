@@ -4,20 +4,22 @@ import { useParams } from "next/navigation";
 
 const GOLD = "#C9A84C", DARK = "#0A0804", SURFACE = "#13110C", CARD = "#1A1710", BORDER = "#2E2A1E", MUTED = "#6B6248";
 
-// Working 3D models from Khronos glTF samples and GitHub CDN
+// Tiny 3D cube model (2KB) - loads instantly on mobile
+const AR_MODEL_URL = "https://modelviewer.dev/shared-assets/models/cube.gltf";
+
 const AR_MODELS = {
-  "Luxury Fashion": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb", ios: null, color: "#C9A84C" },
-  "Home & Lifestyle": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/FlightHelmet/glTF/FlightHelmet.gltf", ios: null, color: "#52b788" },
-  "Premium Tech": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb", ios: null, color: "#7ab8f5" },
-  "Stationery": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Box/glTF/Box.gltf", ios: null, color: "#e87fa8" },
-  "Wellness": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Lantern/glTF/Lantern.gltf", ios: null, color: "#9b91ff" },
-  "Botanicals": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BrainStem/glTF/BrainStem.gltf", ios: null, color: "#52b788" },
-  "Gourmet Food": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxTextured/glTF/BoxTextured.gltf", ios: null, color: "#e87fa8" },
-  "Fine Accessories": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb", ios: null, color: "#C9A84C" },
-  "Memories": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoxTextured/glTF/BoxTextured.gltf", ios: null, color: "#e87fa8" },
-  "Games & Leisure": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BrainStem/glTF/BrainStem.gltf", ios: null, color: "#7ab8f5" },
-  "Creative Arts": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BrainStem/glTF/BrainStem.gltf", ios: null, color: "#9b91ff" },
-  "default": { src: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb", ios: null, color: "#C9A84C" }
+  "Luxury Fashion": { src: AR_MODEL_URL, ios: null, color: "#C9A84C" },
+  "Home & Lifestyle": { src: AR_MODEL_URL, ios: null, color: "#52b788" },
+  "Premium Tech": { src: AR_MODEL_URL, ios: null, color: "#7ab8f5" },
+  "Stationery": { src: AR_MODEL_URL, ios: null, color: "#e87fa8" },
+  "Wellness": { src: AR_MODEL_URL, ios: null, color: "#9b91ff" },
+  "Botanicals": { src: AR_MODEL_URL, ios: null, color: "#52b788" },
+  "Gourmet Food": { src: AR_MODEL_URL, ios: null, color: "#e87fa8" },
+  "Fine Accessories": { src: AR_MODEL_URL, ios: null, color: "#C9A84C" },
+  "Memories": { src: AR_MODEL_URL, ios: null, color: "#e87fa8" },
+  "Games & Leisure": { src: AR_MODEL_URL, ios: null, color: "#7ab8f5" },
+  "Creative Arts": { src: AR_MODEL_URL, ios: null, color: "#9b91ff" },
+  "default": { src: AR_MODEL_URL, ios: null, color: "#C9A84C" }
 };
 
 const PRODUCTS = [
@@ -217,101 +219,50 @@ export default function ProductDetailPage() {
             </div>
             {/* AR Viewer Panel */}
             {showAR && (
-              <div className="ar-panel" style={{ marginTop: "16px", background: CARD, border: `1px solid ${GOLD}33`, borderRadius: "16px", padding: "20px", textAlign: "center" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginBottom: "16px" }}>
-                  <span style={{ fontSize: "14px" }}>✦</span>
-                  <span style={{ fontSize: "11px", color: GOLD, fontWeight: 800, letterSpacing: "1.5px" }}>AR PREVIEW MODE</span>
-                  <span style={{ fontSize: "14px" }}>✦</span>
+              <div className="ar-panel" style={{ marginTop: "16px", background: CARD, border: `1px solid ${GOLD}33`, borderRadius: "16px", padding: "16px", textAlign: "center" }}>
+                <div style={{ fontSize: "11px", color: GOLD, fontWeight: 800, letterSpacing: "1.5px", marginBottom: "12px" }}>
+                  ✦ AR PREVIEW MODE ✦
                 </div>
                 
-                {/* model-viewer container */}
-                <div style={{ position: "relative", borderRadius: "12px", overflow: "hidden", background: SURFACE }}>
+                {/* 3D Viewer */}
+                <div style={{ borderRadius: "12px", overflow: "hidden", background: SURFACE }}>
                   <model-viewer
-                    src={AR_MODELS[product.category]?.src || AR_MODELS.default.src}
-                    ios-src={AR_MODELS[product.category]?.ios || ""}
-                    alt={`3D preview of ${product.name}`}
+                    src={AR_MODEL_URL}
                     ar
-                    ar-modes="webxr scene-viewer quick-look"
+                    ar-modes="scene-viewer webxr quick-look"
                     camera-controls
                     auto-rotate
-                    auto-rotate-delay="0"
-                    rotation-per-second="30deg"
-                    exposure="1.0"
-                    shadow-intensity="1.0"
-                    environment-image="neutral"
-                    interaction-prompt="none"
-                    loading="eager"
-                    reveal="auto"
-                    style={{ width: "100%", height: "300px", background: SURFACE }}
+                    style={{ width: "100%", height: "250px", background: SURFACE }}
                   >
-                    {/* Poster slot */}
-                    <div slot="poster" style={{ width: "100%", height: "300px", background: `linear-gradient(135deg, ${SURFACE} 0%, ${CARD} 100%)`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                      <div style={{ 
-                        width: "80px", 
-                        height: "80px", 
-                        borderRadius: "50%", 
-                        background: `linear-gradient(135deg, ${AR_MODELS[product.category]?.color || GOLD}20, ${AR_MODELS[product.category]?.color || GOLD}40)`,
-                        display: "flex", 
-                        alignItems: "center", 
-                        justifyContent: "center",
-                        marginBottom: "16px",
-                        animation: "pulse 2s infinite"
-                      }}>
-                        <span style={{ fontSize: "36px" }}>🎁</span>
-                      </div>
-                      <div style={{ color: GOLD, fontWeight: 700, fontSize: "14px", marginBottom: "4px" }}>Loading 3D Preview...</div>
-                      <div style={{ color: MUTED, fontSize: "12px" }}>{product.category}</div>
-                    </div>
-                    
-                    {/* AR Button - positioned inside the viewer */}
-                    <button slot="ar-button" style={{ 
-                      position: "absolute", 
-                      bottom: "16px", 
-                      right: "16px", 
-                      background: GOLD, 
-                      color: DARK, 
-                      border: "none", 
-                      borderRadius: "8px", 
-                      padding: "10px 16px", 
-                      fontWeight: 700, 
-                      fontSize: "12px", 
-                      cursor: "pointer", 
-                      display: "flex", 
-                      alignItems: "center", 
-                      gap: "6px",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
-                    }}>
-                      <span>📱</span> View in AR
+                    <button 
+                      slot="ar-button" 
+                      style={{ 
+                        background: GOLD, 
+                        color: DARK, 
+                        border: "none", 
+                        borderRadius: "8px", 
+                        padding: "12px 20px", 
+                        fontWeight: 800, 
+                        fontSize: "14px", 
+                        cursor: "pointer",
+                        fontFamily: "'Nunito',sans-serif",
+                        marginBottom: "10px"
+                      }}
+                    >
+                      📱 View in Your Space
                     </button>
                   </model-viewer>
                 </div>
                 
-                {/* Instructions */}
-                <p style={{ color: MUTED, fontSize: "12px", marginTop: "16px", lineHeight: 1.6 }}>
-                  <strong style={{ color: GOLD }}>Tap "View in AR"</strong> to place this item in your space. Works on iOS 12+ and Android with ARCore.
+                <p style={{ color: MUTED, fontSize: "12px", marginTop: "12px", lineHeight: 1.5 }}>
+                  Tap the button above to launch AR. <br/>
+                  <span style={{ fontSize: "11px" }}>Requires iOS 12+ or Android with ARCore</span>
                 </p>
                 
-                {/* Tech badges */}
-                <div style={{ display: "flex", gap: "8px", justifyContent: "center", marginTop: "12px", flexWrap: "wrap" }}>
-                  {["WebXR", "ARCore", "Quick Look"].map((tech) => (
-                    <span key={tech} style={{ 
-                      padding: "4px 12px", 
-                      background: `${GOLD}15`, 
-                      border: `1px solid ${GOLD}30`, 
-                      borderRadius: "20px", 
-                      fontSize: "10px", 
-                      color: GOLD, 
-                      fontWeight: 600,
-                      letterSpacing: "0.5px"
-                    }}>{tech}</span>
-                  ))}
-                </div>
-                
-                {/* Manual close button */}
                 <button 
                   onClick={() => setShowAR(false)}
                   style={{ 
-                    marginTop: "16px",
+                    marginTop: "12px",
                     padding: "8px 16px",
                     background: "transparent",
                     border: `1px solid ${BORDER}`,
@@ -322,7 +273,7 @@ export default function ProductDetailPage() {
                     fontFamily: "'Nunito',sans-serif"
                   }}
                 >
-                  Close AR Preview
+                  Close Preview
                 </button>
               </div>
             )}
