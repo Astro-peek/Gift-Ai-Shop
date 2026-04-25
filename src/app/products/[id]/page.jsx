@@ -4,8 +4,8 @@ import { useParams } from "next/navigation";
 
 const GOLD = "#C9A84C", DARK = "#0A0804", SURFACE = "#13110C", CARD = "#1A1710", BORDER = "#2E2A1E", MUTED = "#6B6248";
 
-// Tiny 3D cube model (2KB) - loads instantly on mobile
-const AR_MODEL_URL = "https://modelviewer.dev/shared-assets/models/cube.gltf";
+// Reliable GLB model for AR - Astronaut is well-tested
+const AR_MODEL_URL = "https://modelviewer.dev/shared-assets/models/Astronaut.glb";
 
 const AR_MODELS = {
   "Luxury Fashion": { src: AR_MODEL_URL, ios: null, color: "#C9A84C" },
@@ -131,6 +131,24 @@ export default function ProductDetailPage() {
           display: none;
         }
         
+        /* AR Launch Button */
+        .ar-launch-btn {
+          background: #C9A84C;
+          color: #0A0804;
+          border: none;
+          border-radius: 8px;
+          padding: 12px 24px;
+          font-weight: 800;
+          font-size: 14px;
+          cursor: pointer;
+          font-family: 'Nunito', sans-serif;
+          position: absolute;
+          bottom: 16px;
+          right: 16px;
+          z-index: 10;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        
         /* Mobile Responsive */
         @media (max-width: 768px) {
           .product-grid-layout {
@@ -224,32 +242,23 @@ export default function ProductDetailPage() {
                   ✦ AR PREVIEW MODE ✦
                 </div>
                 
-                {/* 3D Viewer */}
-                <div style={{ borderRadius: "12px", overflow: "hidden", background: SURFACE }}>
+                {/* 3D Viewer - Fixed for Mobile AR */}
+                <div style={{ borderRadius: "12px", overflow: "hidden", background: SURFACE, position: "relative" }}>
                   <model-viewer
                     src={AR_MODEL_URL}
                     ar
-                    ar-modes="scene-viewer webxr quick-look"
+                    ar-modes="webxr scene-viewer quick-look"
                     camera-controls
                     auto-rotate
-                    style={{ width: "100%", height: "250px", background: SURFACE }}
+                    shadow-intensity="1"
+                    exposure="1"
+                    style={{ width: "100%", height: "280px", background: SURFACE }}
                   >
                     <button 
                       slot="ar-button" 
-                      style={{ 
-                        background: GOLD, 
-                        color: DARK, 
-                        border: "none", 
-                        borderRadius: "8px", 
-                        padding: "12px 20px", 
-                        fontWeight: 800, 
-                        fontSize: "14px", 
-                        cursor: "pointer",
-                        fontFamily: "'Nunito',sans-serif",
-                        marginBottom: "10px"
-                      }}
+                      className="ar-launch-btn"
                     >
-                      📱 View in Your Space
+                      📱 Launch AR
                     </button>
                   </model-viewer>
                 </div>
