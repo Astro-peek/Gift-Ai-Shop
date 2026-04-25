@@ -3,7 +3,9 @@ import crypto from "crypto";
 import { PrismaClient } from "@prisma/client";
 import { createOrderWithNotifications, OrderValidationError } from "../../../../controllers/orderController";
 
-const prisma = new PrismaClient();
+const globalForPrisma = globalThis;
+const prisma = globalForPrisma.prisma || new PrismaClient();
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 export async function POST(req) {
   try {
@@ -36,7 +38,7 @@ export async function POST(req) {
       return NextResponse.json({ error: err.message }, { status: 400 });
     }
     return NextResponse.json(
-      { error: "Verification failed" },
+      { error: "Verification failed", details: err.message },
       { status: 500 }
     );
   }

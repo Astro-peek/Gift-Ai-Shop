@@ -100,6 +100,13 @@ export default function CartPage() {
         body: JSON.stringify({ amount: total }),
       });
       const data = await res.json();
+      
+      if (!res.ok) {
+        console.error("Create order failed:", data);
+        alert("Payment initialization failed: " + (data.error || data.details || "Unknown error"));
+        setPaying(false);
+        return;
+      }
 
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
@@ -144,7 +151,8 @@ export default function CartPage() {
       });
       rzp.open();
     } catch (e) {
-      alert("Something went wrong. Please retry.");
+      console.error("Payment error:", e);
+      alert("Payment error: " + e.message);
     } finally {
       setPaying(false);
     }
