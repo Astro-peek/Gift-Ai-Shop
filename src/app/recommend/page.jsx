@@ -103,19 +103,34 @@ export default function RecommendPage(){
   return(
     <div style={{fontFamily:"'Nunito',sans-serif",minHeight:"100vh",background:DARK,color:"#F0EAD6"}}>
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet"/>
-      <nav style={{background:SURFACE,borderBottom:`1px solid ${BORDER}`,padding:"0 3rem",display:"flex",alignItems:"center",justifyContent:"space-between",height:"68px"}}>
+      <nav style={{background:SURFACE,borderBottom:`1px solid ${BORDER}`,padding:"0 1rem",display:"flex",alignItems:"center",justifyContent:"space-between",height:"68px"}}>
+        <style>{`
+          @media (min-width: 768px) {
+            nav { padding: 0 3rem !important; }
+          }
+        `}</style>
         <a href="/" style={{textDecoration:"none"}}><Logo/></a>
         <a href="/" style={{color:MUTED,textDecoration:"none",fontSize:"13px",display:"flex",alignItems:"center",gap:"6px"}}>
           <span>←</span> Back to shop
         </a>
       </nav>
 
-      <div style={{maxWidth:"760px",margin:"0 auto",padding:"60px 2rem"}}>
+      <style>{`
+        @media (max-width: 640px) {
+          .recommend-container { padding: 40px 1rem !important; }
+        }
+      `}</style>
+      <div className="recommend-container" style={{maxWidth:"760px",margin:"0 auto",padding:"60px 2rem"}}>
         {!results&&!loading&&(
           <>
+            <style>{`
+              @media (max-width: 640px) {
+                .step-bar { width: 50px !important; }
+              }
+            `}</style>
             <div style={{display:"flex",gap:"8px",justifyContent:"center",marginBottom:"56px"}}>
               {STEPS.map((_,i)=>(
-                <div key={i} style={{height:"2px",width:"80px",background:i<=step?GOLD:BORDER,borderRadius:"2px",transition:"background 0.4s"}}/>
+                <div key={i} className="step-bar" style={{height:"2px",width:"80px",background:i<=step?GOLD:BORDER,borderRadius:"2px",transition:"background 0.4s"}}/>
               ))}
             </div>
             <div style={{textAlign:"center",marginBottom:"44px"}}>
@@ -123,7 +138,12 @@ export default function RecommendPage(){
               <div style={{fontSize:"11px",color:MUTED,letterSpacing:"2.5px",fontWeight:700,marginBottom:"10px"}}>STEP {step+1} OF 3</div>
               <h1 style={{fontFamily:"'Cormorant Garamond',serif",fontSize:"clamp(32px,5vw,52px)",color:"#F0EAD6",letterSpacing:"-0.5px"}}>{STEPS[step].q}</h1>
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(168px,1fr))",gap:"12px"}}>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(140px,1fr))",gap:"10px"}}>
+              <style>{`
+                @media (min-width: 640px) {
+                  .opts-grid { grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)) !important; gap: 12px !important; }
+                }
+              `}</style>
               {STEPS[step].opts.map(opt=>(
                 <button key={opt} onClick={()=>pick(opt)} style={{background:CARD,border:`1px solid ${BORDER}`,borderRadius:"12px",padding:"18px 16px",color:"#F0EAD6",fontFamily:"'Nunito',sans-serif",fontWeight:700,fontSize:"14px",cursor:"pointer",transition:"all 0.15s",textAlign:"center",letterSpacing:"0.2px"}}
                   onMouseEnter={e=>{e.target.style.borderColor=GOLD;e.target.style.color=GOLD;e.target.style.background=`${GOLD}0F`;}}
@@ -155,12 +175,20 @@ export default function RecommendPage(){
               </p>
             </div>
 
+            <style>{`
+              @media (max-width: 640px) {
+                .result-card-inner { flex-direction: column !important; }
+                .result-img-wrap { width: 100% !important; min-width: 100% !important; height: 180px !important; }
+                .result-content { padding: 16px !important; }
+                .best-match-badge { top: 12px !important; left: 12px !important; }
+              }
+            `}</style>
             <div style={{display:"flex",flexDirection:"column",gap:"24px",marginBottom:"44px"}}>
               {results.map((p,i)=>(
-                <div key={p.id} style={{background:CARD,border:`1px solid ${i===0?GOLD+"55":BORDER}`,borderRadius:"16px",overflow:"hidden",position:"relative"}}>
-                  {i===0&&<div style={{position:"absolute",top:"16px",left:"16px",background:`${GOLD}18`,border:`1px solid ${GOLD}44`,color:GOLD,fontSize:"9px",fontWeight:800,padding:"4px 14px",borderRadius:"40px",letterSpacing:"1.5px",zIndex:1}}>✦ BEST MATCH</div>}
-                  <div style={{display:"flex",gap:"0"}}>
-                    <div style={{width:"200px",minWidth:"200px",height:"220px",position:"relative",overflow:"hidden",background:SURFACE}}>
+                <div key={p.id} className="result-card" style={{background:CARD,border:`1px solid ${i===0?GOLD+"55":BORDER}`,borderRadius:"16px",overflow:"hidden",position:"relative"}}>
+                  {i===0&&<div className="best-match-badge" style={{position:"absolute",top:"16px",left:"16px",background:`${GOLD}18`,border:`1px solid ${GOLD}44`,color:GOLD,fontSize:"9px",fontWeight:800,padding:"4px 14px",borderRadius:"40px",letterSpacing:"1.5px",zIndex:1}}>✦ BEST MATCH</div>}
+                  <div className="result-card-inner" style={{display:"flex",gap:"0"}}>
+                    <div className="result-img-wrap" style={{width:"200px",minWidth:"200px",height:"220px",position:"relative",overflow:"hidden",background:SURFACE}}>
                       {!imgErr[p.id]?(
                         <img src={p.image} alt={p.name} onError={()=>setImgErr(prev=>({...prev,[p.id]:true}))}
                           style={{width:"100%",height:"100%",objectFit:"cover"}}/>
@@ -169,7 +197,7 @@ export default function RecommendPage(){
                       )}
                       <div style={{position:"absolute",inset:0,background:"linear-gradient(to right,transparent 60%,rgba(26,23,16,0.8))"}}/>
                     </div>
-                    <div style={{flex:1,padding:"24px 24px 20px"}}>
+                    <div className="result-content" style={{flex:1,padding:"24px 24px 20px"}}>
                       <div style={{fontSize:"9px",color:GOLD,fontWeight:800,letterSpacing:"1.8px",marginBottom:"8px",textTransform:"uppercase"}}>#{i+1} Pick</div>
                       <h3 style={{fontFamily:"'Cormorant Garamond',serif",fontSize:"22px",color:"#F0EAD6",marginBottom:"10px",lineHeight:1.2}}>{p.name}</h3>
                       <p style={{color:MUTED,fontSize:"13px",lineHeight:1.6,marginBottom:"16px"}}>{p.reason}</p>
@@ -190,7 +218,12 @@ export default function RecommendPage(){
               ))}
             </div>
 
-            <div style={{background:SURFACE,border:`1px solid ${BORDER}`,borderRadius:"14px",padding:"20px 24px",marginBottom:"36px",display:"flex",alignItems:"center",gap:"16px"}}>
+            <style>{`
+              @media (max-width: 640px) {
+                .emotion-tip { flex-direction: column !important; text-align: center !important; padding: 16px !important; }
+              }
+            `}</style>
+            <div className="emotion-tip" style={{background:SURFACE,border:`1px solid ${BORDER}`,borderRadius:"14px",padding:"20px 24px",marginBottom:"36px",display:"flex",alignItems:"center",gap:"16px"}}>
               <div style={{fontSize:"28px",color:GOLD,fontFamily:"'Cormorant Garamond',serif"}}>◈</div>
               <div>
                 <div style={{fontWeight:700,color:"#F0EAD6",fontSize:"15px",marginBottom:"3px"}}>GiftAI's Emotion Tip</div>
