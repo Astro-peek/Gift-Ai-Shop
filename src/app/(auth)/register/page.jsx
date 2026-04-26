@@ -48,7 +48,7 @@ export default function RegisterPage() {
       <div>
         <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "64px", color: GOLD, marginBottom: "20px" }}>✦</div>
         <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "42px", color: "#F0EAD6", marginBottom: "12px" }}>Check your inbox!</h1>
-        <p style={{ color: MUTED, fontSize: "14px", fontWeight: 300, maxWidth: "340px", lineHeight: 1.7 }}>We've sent a confirmation link to <strong style={{ color: "#F0EAD6" }}>{email}</strong>. Click it to activate your GiftAI account.</p>
+        <p style={{ color: MUTED, fontSize: "14px", fontWeight: 300, maxWidth: "340px", lineHeight: 1.7 }}>We've sent a confirmation link to <a href={`mailto:${email}`} style={{ color: "#F0EAD6", fontWeight: 600, textDecoration: "underline" }}>{email}</a>. Click it to activate your GiftAI account.</p>
         <a href="/login" style={{ display: "inline-block", marginTop: "32px", background: GOLD, color: DARK, padding: "13px 32px", borderRadius: "10px", fontWeight: 800, textDecoration: "none", fontSize: "14px" }}>Back to Login →</a>
       </div>
     </div>
