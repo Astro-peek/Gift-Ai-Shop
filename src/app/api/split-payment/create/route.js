@@ -35,8 +35,17 @@ export async function POST(req) {
       );
     }
 
+    // Validate participant data
+    const validParticipants = participants.filter(p => p.email && p.amount > 0);
+    if (validParticipants.length === 0) {
+      return NextResponse.json(
+        { error: "At least one valid participant with email and amount is required" },
+        { status: 400 }
+      );
+    }
+
     // Validate that participant amounts sum up to total
-    const participantTotal = participants.reduce((sum, p) => sum + (p.amount || 0), 0);
+    const participantTotal = validParticipants.reduce((sum, p) => sum + (p.amount || 0), 0);
     if (participantTotal !== totalAmount) {
       return NextResponse.json(
         { error: `Participant amounts (${participantTotal}) must equal total amount (${totalAmount})` },
@@ -59,7 +68,7 @@ export async function POST(req) {
         status: "pending",
         expiresAt,
         participants: {
-          create: participants.map(p => ({
+          create: validParticipants.map(p => ({
             email: p.email,
             amount: p.amount,
             status: "pending",
@@ -112,19 +121,24 @@ export async function POST(req) {
 
         updatedParticipants.push(updated);
 
-        // Send email to participant
-        await sendSplitPaymentEmail({
-          to: participant.email,
-          initiatorName,
-          amount: participant.amount,
-          paymentLink: paymentLink.short_url,
-          orderSummary: cartItems,
-        });
+        // Send email to participant (non-blocking - don't fail if email fails)
+        try {
+          await sendSplitPaymentEmail({
+            to: participant.email,
+            initiatorName,
+            amount: participant.amount,
+            paymentLink: paymentLink.short_url,
+            orderSummary: cartItems,
+          });
+        } catch (emailError) {
+          console.error(`Failed to send email to ${participant.email}:`, emailError);
+          // Continue - payment link is created, email is secondary
+        }
 
       } catch (linkError) {
         console.error(`Failed to create payment link for ${participant.email}:`, linkError);
         // Continue with other participants, this one will have null link
-        updatedParticipants.push(participant);
+        updatedParticipants.push({...participant, error: linkError.message});
       }
     }
 

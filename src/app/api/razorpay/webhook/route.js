@@ -69,14 +69,18 @@ export async function POST(req) {
 
       console.log(`Updated participant ${participantId} to paid status`);
 
-      // Send confirmation email to initiator
+      // Send confirmation email to initiator (non-blocking)
       if (initiatorEmail) {
-        await sendPaymentConfirmationEmail({
-          to: initiatorEmail,
-          initiatorName,
-          amount: updatedParticipant.amount,
-          paidBy: updatedParticipant.email,
-        });
+        try {
+          await sendPaymentConfirmationEmail({
+            to: initiatorEmail,
+            initiatorName,
+            amount: updatedParticipant.amount,
+            paidBy: updatedParticipant.email,
+          });
+        } catch (emailErr) {
+          console.error("Failed to send confirmation email:", emailErr);
+        }
       }
 
       // Check if all participants have paid
@@ -101,36 +105,45 @@ export async function POST(req) {
           data: { status: newStatus },
         });
 
-        // If all paid, create the actual order
-        if (allPaid && !splitPayment.orderId) {
-          try {
-            const { createOrderWithNotifications } = await import("../../../../controllers/orderController");
-            
-            const orderDetails = {
-              userId: splitPayment.initiatorId,
-              userEmail: splitPayment.initiatorEmail,
-              userName: splitPayment.initiatorName,
-              total: splitPayment.totalAmount,
-              address: splitPayment.address,
-              paymentMethod: "SPLIT_PAYMENT",
-              items: splitPayment.cartItems,
-            };
+        // If all paid, create the actual order (idempotent - check again)
+        if (allPaid) {
+          // Double-check order hasn't been created (race condition protection)
+          const freshSplitPayment = await prisma.splitPayment.findUnique({
+            where: { id: splitPaymentId },
+            select: { orderId: true }
+          });
+          
+          if (!freshSplitPayment?.orderId) {
+            try {
+              const { createOrderWithNotifications } = await import("../../../../controllers/orderController");
+              
+              const orderDetails = {
+                userId: splitPayment.initiatorId,
+                userEmail: splitPayment.initiatorEmail,
+                userName: splitPayment.initiatorName,
+                total: splitPayment.totalAmount,
+                address: splitPayment.address,
+                paymentMethod: "SPLIT_PAYMENT",
+                items: splitPayment.cartItems,
+              };
 
-            const order = await createOrderWithNotifications({
-              prisma,
-              orderDetails,
-              paymentMethod: "SPLIT_PAYMENT",
-              status: "pending",
-            });
+              const order = await createOrderWithNotifications({
+                prisma,
+                orderDetails,
+                paymentMethod: "SPLIT_PAYMENT",
+                status: "pending",
+              });
 
-            await prisma.splitPayment.update({
-              where: { id: splitPaymentId },
-              data: { orderId: order.id },
-            });
+              await prisma.splitPayment.update({
+                where: { id: splitPaymentId },
+                data: { orderId: order.id },
+              });
 
-            console.log(`Created order ${order.id} for split payment ${splitPaymentId}`);
-          } catch (orderError) {
-            console.error("Failed to create order after split payment completion:", orderError);
+              console.log(`Created order ${order.id} for split payment ${splitPaymentId}`);
+            } catch (orderError) {
+              console.error("Failed to create order after split payment completion:", orderError);
+              // Don't fail the webhook - order can be created manually later
+            }
           }
         }
       }
