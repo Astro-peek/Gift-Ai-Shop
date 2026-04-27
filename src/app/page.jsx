@@ -237,7 +237,7 @@ export default function HomePage() {
         
         {/* Desktop Navigation */}
         <div style={{ display:"flex", gap:"2px" }} className="desktop-nav">
-          {[["Home","/"],["Recommend","/recommend"],["Orders","/orders"],["Admin","/admin"]].map(([n, href]) => (
+          {[["Home","/"],["Recommend","/recommend"],["Split Payments","/split-payment"],["Orders","/orders"],["Admin","/admin"]].map(([n, href]) => (
             <a key={n} href={href} style={{ color:MUTED, textDecoration:"none", padding:"7px 16px", borderRadius:"6px", fontSize:"13px", fontWeight:600, letterSpacing:"0.5px" }}>{n}</a>
           ))}
         </div>
@@ -284,6 +284,7 @@ export default function HomePage() {
                       <div>{user.email}</div>
                     </div>
                     <a href="/profile" style={{ display:"block", padding:"9px 14px", color:MUTED, textDecoration:"none", fontSize:"13px", borderRadius:"7px" }}>My Profile</a>
+                    <a href="/split-payment" style={{ display:"block", padding:"9px 14px", color:GOLD, textDecoration:"none", fontSize:"13px", fontWeight:700, borderRadius:"7px" }}>💰 Split Payments</a>
                     <a href="/orders" style={{ display:"block", padding:"9px 14px", color:MUTED, textDecoration:"none", fontSize:"13px", borderRadius:"7px" }}>My Orders</a>
                     <button onClick={handleLogout} style={{ width:"100%", textAlign:"left", padding:"9px 14px", color:"#e24b4a", background:"none", border:"none", fontSize:"13px", cursor:"pointer", fontFamily:"'Nunito',sans-serif", borderRadius:"7px" }}>Sign Out</button>
                   </>

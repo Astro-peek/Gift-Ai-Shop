@@ -52,6 +52,7 @@ model Order {
   updatedAt     DateTime       @updatedAt
   items         OrderItem[]
   notifications Notification[]
+  splitPayment  SplitPayment?
 }
 
 model OrderItem {
@@ -74,4 +75,36 @@ model Notification {
   message   String
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+model SplitPayment {
+  id              String                   @id @default(uuid())
+  orderId         String?                  @unique
+  order           Order?                   @relation(fields: [orderId], references: [id])
+  initiatorId     String
+  initiatorName   String
+  initiatorEmail  String
+  totalAmount     Int
+  status          String                   @default("pending") // pending | partial_paid | paid | expired | cancelled
+  cartItems       Json
+  address         String
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+  expiresAt       DateTime?
+  participants    SplitPaymentParticipant[]
+}
+
+model SplitPaymentParticipant {
+  id              String       @id @default(uuid())
+  splitPaymentId  String
+  splitPayment    SplitPayment @relation(fields: [splitPaymentId], references: [id], onDelete: Cascade)
+  email           String
+  amount          Int
+  razorpayLinkId  String?
+  paymentLink     String?
+  status          String       @default("pending") // pending | paid | failed | expired
+  paidAt          DateTime?
+  razorpayPaymentId String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
 }
