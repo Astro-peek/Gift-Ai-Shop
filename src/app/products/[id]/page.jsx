@@ -4,24 +4,6 @@ import { useParams } from "next/navigation";
 
 const GOLD = "#C9A84C", DARK = "#0A0804", SURFACE = "#13110C", CARD = "#1A1710", BORDER = "#2E2A1E", MUTED = "#6B6248";
 
-// Reliable GLB model for AR - Astronaut is well-tested
-const AR_MODEL_URL = "https://modelviewer.dev/shared-assets/models/Astronaut.glb";
-
-const AR_MODELS = {
-  "Luxury Fashion": { src: AR_MODEL_URL, ios: null, color: "#C9A84C" },
-  "Home & Lifestyle": { src: AR_MODEL_URL, ios: null, color: "#52b788" },
-  "Premium Tech": { src: AR_MODEL_URL, ios: null, color: "#7ab8f5" },
-  "Stationery": { src: AR_MODEL_URL, ios: null, color: "#e87fa8" },
-  "Wellness": { src: AR_MODEL_URL, ios: null, color: "#9b91ff" },
-  "Botanicals": { src: AR_MODEL_URL, ios: null, color: "#52b788" },
-  "Gourmet Food": { src: AR_MODEL_URL, ios: null, color: "#e87fa8" },
-  "Fine Accessories": { src: AR_MODEL_URL, ios: null, color: "#C9A84C" },
-  "Memories": { src: AR_MODEL_URL, ios: null, color: "#e87fa8" },
-  "Games & Leisure": { src: AR_MODEL_URL, ios: null, color: "#7ab8f5" },
-  "Creative Arts": { src: AR_MODEL_URL, ios: null, color: "#9b91ff" },
-  "default": { src: AR_MODEL_URL, ios: null, color: "#C9A84C" }
-};
-
 const PRODUCTS = [
   { id:1, name:"Hermès-Style Silk Scarf", price:3499, category:"Luxury Fashion", tags:["women","luxury","anniversary"], rating:4.9, reviews:312, image:"https://images.unsplash.com/photo-1601924994987-69e26d50dc26?w=800&q=90", badge:"Bestseller", desc:"Hand-rolled edges, 100% pure silk. Arrives in our signature gift box with satin ribbon. A timeless declaration of elegance — she'll drape herself in your affection every day.", stock:50, arSrc:null, longDesc:"Crafted from 100% pure, Grade A habotai silk, this scarf is a tribute to the art of luxury gifting. Each edge is hand-rolled by artisans in a 3-day process. The pattern is printed using eco-certified dyes that retain vibrancy wash after wash. Ships in our signature black gift box with gold satin ribbon and a personalized gift note card." },
   { id:2, name:"Japanese Cast Iron Tea Set", price:4299, category:"Home & Lifestyle", tags:["parents","home","birthday"], rating:4.8, reviews:178, image:"https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=800&q=90", badge:"Top Rated", desc:"Authentic tetsubin design with 4 cups. Keeps tea perfectly hot for 2+ hours.", stock:25, arSrc:null, longDesc:"Forged using traditional Japanese casting techniques, this tetsubin (cast iron teapot) retains heat for over 2 hours. Set includes the teapot, 4 cast iron cups, a bamboo tray, and a mini strainer. The interior is enamel-coated to prevent rust. A morning ritual elevated to an art form." },
@@ -68,16 +50,24 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [cartAdded, setCartAdded] = useState(false);
   const [qty, setQty] = useState(1);
-  const [showAR, setShowAR] = useState(false);
   const [activeImg, setActiveImg] = useState(0);
 
   useEffect(() => {
-    // Simulate DB fetch with localStorage cart init
-    setTimeout(() => {
-      const p = PRODUCTS.find(x => x.id === id);
-      setProduct(p || null);
-      setLoading(false);
-    }, 600);
+    async function fetchProduct() {
+      try {
+        const res = await fetch(`/api/products/${id}`);
+        if (!res.ok) throw new Error('Product not found');
+        const p = await res.json();
+        setProduct(p);
+      } catch (err) {
+        // Fallback to local data for demo
+        const p = PRODUCTS.find(x => x.id === id);
+        setProduct(p || null);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProduct();
   }, [id]);
 
   const addToCart = () => {
@@ -133,79 +123,9 @@ export default function ProductDetailPage() {
   return (
     <div style={{ fontFamily: "'Nunito',sans-serif", minHeight: "100vh", background: DARK, color: "#F0EAD6" }}>
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet"/>
-      {/* model-viewer for AR */}
-      <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
       
-      {/* AR Animations & Mobile Responsive Styles */}
+      {/* Mobile Responsive Styles */}
       <style>{`
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); opacity: 1; }
-          50% { transform: scale(1.05); opacity: 0.8; }
-        }
-        model-viewer {
-          --poster-color: transparent;
-        }
-        model-viewer::part(default-ar-button) {
-          display: none;
-        }
-        
-        /* AR Launch Button - inside model-viewer */
-        .ar-launch-btn {
-          background: #C9A84C;
-          color: #0A0804;
-          border: none;
-          border-radius: 10px;
-          padding: 14px 24px;
-          font-weight: 800;
-          font-size: 15px;
-          cursor: pointer;
-          font-family: 'Nunito', sans-serif;
-          position: absolute;
-          bottom: 16px;
-          right: 16px;
-          z-index: 10;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-          transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .ar-launch-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-        }
-        
-        /* AR Action Buttons Row */
-        .ar-action-btn {
-          background: #C9A84C;
-          color: #0A0804;
-          border: none;
-          border-radius: 8px;
-          padding: 12px 24px;
-          font-weight: 800;
-          font-size: 14px;
-          cursor: pointer;
-          font-family: 'Nunito', sans-serif;
-          transition: all 0.2s;
-        }
-        .ar-action-btn:hover {
-          background: #d4b55c;
-          transform: translateY(-1px);
-        }
-        .ar-close-btn {
-          background: transparent;
-          color: #6B6248;
-          border: 1px solid #2E2A1E;
-          border-radius: 8px;
-          padding: 12px 24px;
-          font-weight: 700;
-          font-size: 14px;
-          cursor: pointer;
-          font-family: 'Nunito', sans-serif;
-          transition: all 0.2s;
-        }
-        .ar-close-btn:hover {
-          background: #1A1710;
-          color: #F0EAD6;
-        }
-        
         /* Mobile Responsive */
         @media (max-width: 768px) {
           .product-grid-layout {
@@ -223,12 +143,6 @@ export default function ProductDetailPage() {
           }
           .thumbnail-strip > div {
             flex-shrink: 0;
-          }
-          .ar-panel {
-            padding: 16px !important;
-          }
-          .ar-panel model-viewer {
-            height: 250px !important;
           }
           .nav-padding {
             padding: 0 1rem !important;
@@ -250,9 +164,6 @@ export default function ProductDetailPage() {
         @media (max-width: 480px) {
           .main-image-container {
             height: 280px !important;
-          }
-          .ar-panel model-viewer {
-            height: 200px !important;
           }
           .price-text {
             font-size: 28px !important;
@@ -286,68 +197,7 @@ export default function ProductDetailPage() {
                   <img src={img} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
                 </div>
               ))}
-              {/* AR Button */}
-              <div onClick={() => setShowAR(!showAR)} style={{ width: "80px", height: "80px", borderRadius: "10px", cursor: "pointer", border: `2px solid ${showAR ? GOLD : BORDER}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "4px", background: showAR ? `${GOLD}12` : CARD, transition: "all 0.2s" }}>
-                <span style={{ fontSize: "20px" }}>🪄</span>
-                <span style={{ fontSize: "9px", color: showAR ? GOLD : MUTED, fontWeight: 700, letterSpacing: "0.5px" }}>AR VIEW</span>
-              </div>
             </div>
-            {/* AR Viewer Panel */}
-            {showAR && (
-              <div className="ar-panel" style={{ marginTop: "16px", background: CARD, border: `1px solid ${GOLD}33`, borderRadius: "16px", padding: "16px", textAlign: "center" }}>
-                <div style={{ fontSize: "11px", color: GOLD, fontWeight: 800, letterSpacing: "1.5px", marginBottom: "12px" }}>
-                  ✦ 3D / AR PREVIEW ✦
-                </div>
-                
-                {/* 3D Viewer Container */}
-                <div style={{ borderRadius: "12px", overflow: "hidden", background: SURFACE, position: "relative" }}>
-                  <model-viewer
-                    id="ar-model"
-                    src={AR_MODEL_URL}
-                    ar
-                    ar-modes="webxr scene-viewer quick-look"
-                    camera-controls
-                    auto-rotate
-                    shadow-intensity="1"
-                    exposure="1"
-                    alt="3D Product Preview"
-                    style={{ width: "100%", height: "280px", background: SURFACE }}
-                  >
-                    {/* AR Button - built into model-viewer */}
-                    <button slot="ar-button" className="ar-launch-btn">
-                      📱 Launch AR
-                    </button>
-                  </model-viewer>
-                </div>
-                
-                {/* Action Buttons Row */}
-                <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "12px", flexWrap: "wrap" }}>
-                  <button 
-                    className="ar-action-btn"
-                    onClick={() => {
-                      const viewer = document.getElementById('ar-model');
-                      if (viewer && viewer.activateAR) {
-                        viewer.activateAR();
-                      } else {
-                        alert('AR requires:\n• iPhone/iPad with iOS 12+\n• Android with ARCore\n\nOn desktop: Click & drag to rotate');
-                      }
-                    }}
-                  >
-                    🥽 View in AR
-                  </button>
-                  <button 
-                    className="ar-close-btn"
-                    onClick={() => setShowAR(false)}
-                  >
-                    ✕ Close
-                  </button>
-                </div>
-                
-                <p style={{ color: MUTED, fontSize: "10px", marginTop: "10px", lineHeight: 1.4 }}>
-                  📱 Mobile: Tap "View in AR" | 💻 Desktop: Click & drag to rotate
-                </p>
-              </div>
-            )}
           </div>
 
           {/* INFO PANEL */}

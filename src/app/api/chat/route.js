@@ -1,58 +1,67 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { PrismaClient } from "@prisma/client";
 
-const PRODUCTS = [
-  { name: "Hermès-Style Silk Scarf", price: "₹3,499", category: "Luxury Fashion", detail: "Pure silk, hand-rolled edges" },
-  { name: "Japanese Cast Iron Tea Set", price: "₹4,299", category: "Home & Lifestyle", detail: "Traditional tetsubin design" },
-  { name: "Sony WH-1000XM5", price: "₹6,999", category: "Premium Tech", detail: "Industry-leading noise cancellation" },
-  { name: "Leather Bound Journal", price: "₹1,899", category: "Stationery", detail: "Italian leather, handstitched" },
-  { name: "Luxury Aroma Diffuser", price: "₹2,999", category: "Wellness", detail: "Ultrasonic with essential oils" },
-  { name: "Rare Orchid", price: "₹2,199", category: "Botanicals", detail: "Live bloom in glazed ceramic" },
-  { name: "Belgian Chocolate Box", price: "₹2,499", category: "Gourmet Food", detail: "32 hand-crafted pralines" },
-  { name: "Swiss Automatic Watch", price: "₹12,999", category: "Fine Accessories", detail: "Swiss movement, sapphire crystal" },
-  { name: "Polaroid Photo Kit", price: "₹1,299", category: "Memories", detail: "Instant camera + scrapbook" },
-  { name: "Ayurvedic Wellness Hamper", price: "₹3,799", category: "Wellness", detail: "10-piece holistic set" },
-  { name: "Marble Chess Set", price: "₹5,499", category: "Games & Leisure", detail: "Hand-carved marble & alabaster" },
-  { name: "Professional Art Set", price: "₹4,199", category: "Creative Arts", detail: "120-piece studio-grade set" },
-  { name: "Kashmiri Pashmina Shawl", price: "₹8,999", category: "Luxury Fashion", detail: "Hand-woven pure Pashmina wool" },
-  { name: "Philips Hue Light Set", price: "₹5,499", category: "Home & Lifestyle", detail: "Smart ambient 16M colors" },
-  { name: "Keychron K2 Keyboard", price: "₹3,299", category: "Premium Tech", detail: "Wireless mechanical RGB" },
-  { name: "Montblanc Fountain Pen", price: "₹4,599", category: "Stationery", detail: "14K gold nib, resin body" },
-  { name: "Tibetan Singing Bowl", price: "₹1,899", category: "Wellness", detail: "Hand-hammered brass meditation" },
-  { name: "Japanese Bonsai Kit", price: "₹2,699", category: "Botanicals", detail: "Complete starter with 3 trees" },
-  { name: "Single Origin Coffee", price: "₹1,999", category: "Gourmet Food", detail: "4 premium origins, fresh roasted" },
-  { name: "Ridge Titanium Wallet", price: "₹3,499", category: "Fine Accessories", detail: "RFID-blocking minimalist" },
-  { name: "Custom Star Map", price: "₹1,599", category: "Memories", detail: "Personalized night sky frame" },
-  { name: "Theory11 Playing Cards", price: "₹1,299", category: "Games & Leisure", detail: "Gold foil luxury deck" },
-  { name: "Pottery Wheel Kit", price: "₹5,999", category: "Creative Arts", detail: "Electric wheel with clay & tools" },
-  { name: "Mulberry Silk Sleep Set", price: "₹2,799", category: "Wellness", detail: "22 Momme anti-aging silk" },
-  { name: "Audio-Technica Turntable", price: "₹8,999", category: "Premium Tech", detail: "Belt-drive Hi-Fi vinyl" },
-  { name: "Full-Grain Leather Belt", price: "₹2,199", category: "Fine Accessories", detail: "Italian vegetable-tanned" },
-  { name: "Artisan Spice Box", price: "₹1,799", category: "Gourmet Food", detail: "9 exotic global spices" },
-  { name: "Golden Acrylic Paint Set", price: "₹3,499", category: "Creative Arts", detail: "24 heavy-body artist pigments" },
-  { name: "Crystal Decanter Set", price: "₹6,499", category: "Home & Lifestyle", detail: "24% PbO lead crystal bar set" },
-  { name: "Jo Malone Fragrance Set", price: "₹7,499", category: "Luxury Fashion", detail: "5 signature colognes" },
-];
-
+const prisma = new PrismaClient();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// Cache products for 5 minutes to reduce DB calls
+let cachedProducts = null;
+let cacheTimestamp = null;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+async function getProducts() {
+  const now = Date.now();
+  if (cachedProducts && cacheTimestamp && (now - cacheTimestamp) < CACHE_DURATION) {
+    return cachedProducts;
+  }
+  
+  const products = await prisma.product.findMany({
+    where: { isActive: true },
+    select: {
+      name: true,
+      price: true,
+      category: true,
+      desc: true,
+      badge: true,
+    },
+  });
+  
+  // Format for AI (name, price with rupee symbol, category, detail)
+  const formattedProducts = products.map(p => ({
+    name: p.name,
+    price: `₹${p.price.toLocaleString()}`,
+    category: p.category,
+    detail: p.desc.substring(0, 60) + (p.desc.length > 60 ? "..." : ""),
+    badge: p.badge,
+  }));
+  
+  cachedProducts = formattedProducts;
+  cacheTimestamp = now;
+  return formattedProducts;
+}
 
 export async function POST(req) {
   try {
     const { message, history } = await req.json();
+    
+    // Fetch products from database
+    const products = await getProducts();
 
     const hasKey = process.env.GEMINI_API_KEY && !process.env.GEMINI_API_KEY.includes("placeholder") && !process.env.GEMINI_API_KEY.includes("your-");
     
     console.log("--- CHAT REQUEST ---");
     console.log("GEMINI_API_KEY Found:", !!process.env.GEMINI_API_KEY);
     console.log("GEMINI_API_KEY Valid:", hasKey);
+    console.log("Products loaded:", products.length);
 
     if (!hasKey) {
-      return NextResponse.json({ reply: getFallbackReply(message) });
+      return NextResponse.json({ reply: getFallbackReply(message, products) });
     }
 
     const model = genAI.getGenerativeModel({ 
       model: "gemini-flash-latest",
-      systemInstruction: `You are the GiftAI Concierge. CATALOG: ${JSON.stringify(PRODUCTS)}. RULES: 1. Sophisticated tone. 2. Recommend 1-2 items from catalog with prices. 3. Short responses (max 40 words).`
+      systemInstruction: `You are the GiftAI Concierge. CATALOG: ${JSON.stringify(products)}. RULES: 1. Sophisticated tone. 2. Recommend 1-2 items from catalog with prices. 3. Short responses (max 40 words).`
     });
 
     let formattedHistory = (history || []).map(m => ({
@@ -75,17 +84,45 @@ export async function POST(req) {
 
   } catch (error) {
     console.error("DEBUG: Gemini Error:", error);
-    return NextResponse.json({ reply: getFallbackReply("gift recommendations") });
+    // Try to get products for fallback even in error case
+    try {
+      const products = await getProducts();
+      return NextResponse.json({ reply: getFallbackReply("gift recommendations", products) });
+    } catch {
+      return NextResponse.json({ reply: "I'm here to help you find the perfect gift! What occasion are you shopping for?" });
+    }
   }
 }
 
-function getFallbackReply(msg) {
+function getFallbackReply(msg, products) {
   const q = msg.toLowerCase();
-  if (q.includes("tech") || q.includes("music") || q.includes("gadget")) 
-    return "For a modern touch, our Sony WH-1000XM5 (₹6,999) is an absolute standout. It's the gold standard in noise cancellation.";
-  if (q.includes("mom") || q.includes("mother") || q.includes("woman") || q.includes("her"))
-    return "The Hermès-Style Silk Scarf (₹3,499) is a timeless choice for her, though a Rare Orchid (₹2,199) also brings lasting joy.";
-  if (q.includes("dad") || q.includes("father") || q.includes("him") || q.includes("man"))
-    return "I'd suggest the Swiss Automatic Watch (₹12,999) for a grand gesture, or the Marble Chess Set (₹5,499) for a classic intellectual gift.";
-  return "What a lovely gift idea. To give you the best advice, could you tell me a little more about who this gift is for? Our Belgian Chocolate Box (₹2,499) is always a safe, decadent choice in the meantime.";
+  
+  // Find products by category from database
+  const techProducts = products?.filter(p => p.category === "Premium Tech");
+  const fashionProducts = products?.filter(p => p.category === "Luxury Fashion");
+  const accessoriesProducts = products?.filter(p => p.category === "Fine Accessories");
+  const foodProducts = products?.filter(p => p.category === "Gourmet Food");
+  
+  if (q.includes("tech") || q.includes("music") || q.includes("gadget")) {
+    const tech = techProducts?.[0];
+    if (tech) return `For a modern touch, our ${tech.name} (${tech.price}) is an absolute standout. ${tech.detail}`;
+  }
+  
+  if (q.includes("mom") || q.includes("mother") || q.includes("woman") || q.includes("her")) {
+    const fashion = fashionProducts?.[0];
+    if (fashion) return `The ${fashion.name} (${fashion.price}) is a timeless choice for her. ${fashion.detail}`;
+  }
+  
+  if (q.includes("dad") || q.includes("father") || q.includes("him") || q.includes("man")) {
+    const accessory = accessoriesProducts?.[0];
+    if (accessory) return `I'd suggest the ${accessory.name} (${accessory.price}) for a grand gesture. ${accessory.detail}`;
+  }
+  
+  // Default recommendation
+  const defaultProduct = foodProducts?.[0] || products?.[0];
+  if (defaultProduct) {
+    return `What a lovely gift idea. To give you the best advice, could you tell me a little more about who this gift is for? Our ${defaultProduct.name} (${defaultProduct.price}) is always a safe, decadent choice in the meantime.`;
+  }
+  
+  return "What a lovely gift idea! To give you the best advice, could you tell me more about who you're shopping for and your budget?";
 }
