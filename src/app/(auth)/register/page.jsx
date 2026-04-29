@@ -5,13 +5,21 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 const GOLD = "#C9A84C", DARK = "#0A0804", SURFACE = "#13110C", CARD = "#1A1710", BORDER = "#2E2A1E", MUTED = "#6B6248";
 
 const Logo = () => (
-  <svg width="130" height="32" viewBox="0 0 148 40" fill="none">
-    <rect x="1" y="9" width="22" height="22" rx="5" fill="#C9A84C" fillOpacity="0.12" stroke="#C9A84C" strokeWidth="1.1"/>
-    <path d="M12 9 L12 5 Q12 3 10 3 Q8 3 8 5 Q8 7 10 9 Z" fill="#C9A84C"/>
-    <path d="M12 9 L12 5 Q12 3 14 3 Q16 3 16 5 Q16 7 14 9 Z" fill="#C9A84C"/>
-    <rect x="6" y="9" width="12" height="3" rx="1.5" fill="#C9A84C"/>
-    <rect x="11" y="12" width="2" height="19" rx="1" fill="#C9A84C" fillOpacity="0.55"/>
-    <text x="30" y="28" fontFamily="Georgia,serif" fontSize="21" fontWeight="700" fill="#C9A84C" letterSpacing="1.5">GiftAI</text>
+  <svg width="200" height="50" viewBox="0 0 148 40" fill="none" style={{ filter: "drop-shadow(0 0 12px rgba(201, 168, 76, 0.4))" }}>
+    <defs>
+      <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stopColor="#C9A84C"/>
+        <stop offset="50%" stopColor="#E8C97A"/>
+        <stop offset="100%" stopColor="#C9A84C"/>
+      </linearGradient>
+    </defs>
+    <rect x="1" y="9" width="22" height="22" rx="5" fill="#C9A84C" fillOpacity="0.15" stroke="url(#logoGrad)" strokeWidth="1.2"/>
+    <path d="M12 9 L12 5 Q12 3 10 3 Q8 3 8 5 Q8 7 10 9 Z" fill="#E8C97A"/>
+    <path d="M12 9 L12 5 Q12 3 14 3 Q16 3 16 5 Q16 7 14 9 Z" fill="#E8C97A"/>
+    <rect x="6" y="9" width="12" height="3" rx="1.5" fill="#E8C97A"/>
+    <rect x="11" y="12" width="2" height="19" rx="1" fill="#C9A84C" fillOpacity="0.7"/>
+    <line x1="6" y1="20.5" x2="18" y2="20.5" stroke="#C9A84C" strokeWidth="0.8" strokeOpacity="0.5"/>
+    <text x="30" y="28" fontFamily="Georgia,serif" fontSize="22" fontWeight="700" fill="url(#logoGrad)" letterSpacing="2">GiftAI</text>
   </svg>
 );
 
@@ -60,7 +68,7 @@ export default function RegisterPage() {
       <div style={{ position: "fixed", top: "20%", left: "50%", transform: "translateX(-50%)", width: "600px", height: "300px", background: `radial-gradient(ellipse, ${GOLD}0F 0%, transparent 70%)`, pointerEvents: "none" }}/>
       <div style={{ width: "100%", maxWidth: "420px" }}>
         <div style={{ textAlign: "center", marginBottom: "40px" }}>
-          <a href="/" style={{ display: "inline-block", marginBottom: "28px", textDecoration: "none" }}><Logo/></a>
+          <a href="/" style={{ display: "inline-block", marginBottom: "32px", textDecoration: "none", transition: "transform 0.3s ease" }} onMouseEnter={e => e.currentTarget.style.transform = "scale(1.05)"} onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}><Logo/></a>
           <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "38px", color: "#F0EAD6", marginBottom: "8px", letterSpacing: "-0.5px" }}>Create account</h1>
           <p style={{ color: MUTED, fontSize: "14px", fontWeight: 300 }}>Start gifting with AI-powered precision</p>
         </div>
