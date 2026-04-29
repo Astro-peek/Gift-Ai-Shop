@@ -71,7 +71,8 @@ export default function HomePage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("/api/products");
+        // Add cache-buster to ensure fresh data (no browser caching)
+        const res = await fetch(`/api/products?t=${Date.now()}`);
         if (res.ok) {
           const data = await res.json();
           setProducts(data);
