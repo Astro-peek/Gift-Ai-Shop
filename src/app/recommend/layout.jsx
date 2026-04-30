@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Gift Recommender Quiz — GiftAI",
+  title: "Gift Recommender Quiz — Giftara",
   description: "Answer 3 quick questions and our AI will curate the perfect luxury gift for your occasion, recipient, and budget.",
 };
 

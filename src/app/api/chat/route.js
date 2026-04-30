@@ -61,7 +61,7 @@ export async function POST(req) {
 
     const model = genAI.getGenerativeModel({ 
       model: "gemini-flash-latest",
-      systemInstruction: `You are the GiftAI Concierge. CATALOG: ${JSON.stringify(products)}. RULES: 1. Sophisticated tone. 2. Recommend 1-2 items from catalog with prices. 3. Short responses (max 40 words).`
+      systemInstruction: `You are the Giftara Concierge. CATALOG: ${JSON.stringify(products)}. RULES: 1. Sophisticated tone. 2. Recommend 1-2 items from catalog with prices. 3. Short responses (max 40 words).`
     });
 
     let formattedHistory = (history || []).map(m => ({

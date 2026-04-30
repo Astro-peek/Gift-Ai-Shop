@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 const GOLD="#C9A84C",DARK="#0A0804",SURFACE="#13110C",CARD="#1A1710",BORDER="#2E2A1E",MUTED="#6B6248";
-const Logo=()=><svg width="120" height="28" viewBox="0 0 148 40" fill="none"><rect x="1" y="9" width="22" height="22" rx="5" fill="#C9A84C" fillOpacity="0.12" stroke="#C9A84C" strokeWidth="1.1"/><path d="M12 9 L12 5 Q12 3 10 3 Q8 3 8 5 Q8 7 10 9 Z" fill="#C9A84C"/><path d="M12 9 L12 5 Q12 3 14 3 Q16 3 16 5 Q16 7 14 9 Z" fill="#C9A84C"/><rect x="6" y="9" width="12" height="3" rx="1.5" fill="#C9A84C"/><rect x="11" y="12" width="2" height="19" rx="1" fill="#C9A84C" fillOpacity="0.55"/><text x="30" y="28" fontFamily="Georgia,serif" fontSize="21" fontWeight="700" fill="#C9A84C" letterSpacing="1.5">GiftAI</text></svg>;
+const Logo=()=><svg width="120" height="28" viewBox="0 0 148 40" fill="none"><rect x="1" y="9" width="22" height="22" rx="5" fill="#C9A84C" fillOpacity="0.12" stroke="#C9A84C" strokeWidth="1.1"/><path d="M12 9 L12 5 Q12 3 10 3 Q8 3 8 5 Q8 7 10 9 Z" fill="#C9A84C"/><path d="M12 9 L12 5 Q12 3 14 3 Q16 3 16 5 Q16 7 14 9 Z" fill="#C9A84C"/><rect x="6" y="9" width="12" height="3" rx="1.5" fill="#C9A84C"/><rect x="11" y="12" width="2" height="19" rx="1" fill="#C9A84C" fillOpacity="0.55"/><text x="30" y="28" fontFamily="Georgia,serif" fontSize="21" fontWeight="700" fill="#C9A84C" letterSpacing="1.5">Giftara</text></svg>;
 
 const SC={delivered:"#52b788",shipped:GOLD,confirmed:"#378add",placed:MUTED};
 const SE={delivered:"✦",shipped:"→",confirmed:"✓",placed:"○"};
@@ -44,6 +44,7 @@ export default function OrdersPage(){
         <a href="/" style={{color:MUTED,textDecoration:"none",fontSize:"13px"}}>← Back to shop</a>
       </nav>
       <div style={{maxWidth:"1100px",margin:"0 auto",padding:"48px 2rem"}}>
+        <title>My Orders — Giftara</title>
         <h1 style={{fontFamily:"'Cormorant Garamond',serif",fontSize:"48px",marginBottom:"6px",color:"#F0EAD6"}}>My Orders</h1>
         <p style={{color:MUTED,marginBottom:"40px",fontSize:"14px",fontWeight:300}}>Track and manage your luxury gift orders</p>
         

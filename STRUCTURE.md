@@ -1,6 +1,6 @@
-# GiftAI — Project Structure & Logic Overview
+# Giftara — Project Structure & Logic Overview
 
-Welcome to **GiftAI**, a premium, AI-powered gift recommendation engine built for speed and aesthetics. This document explains the internal "magic" of how the app works so you can explain it to the judges!
+Welcome to **Giftara**, a premium, AI-powered gift recommendation engine built for speed and aesthetics. This document explains the internal "magic" of how the app works so you can explain it to the judges!
 
 ---
 
@@ -61,4 +61,4 @@ Since this is a Hackathon MVP, we use **"Expert Systems" logic** to ensure 100% 
 3.  **Payments**: Integrate Razorpay (logic is planned in the README).
 
 ---
-*Built with ❤️ by the GiftAI Team.*
+*Built with ❤️ by the Giftara Team.*

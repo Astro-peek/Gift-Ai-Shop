@@ -72,12 +72,12 @@ export default function ProductDetailPage() {
 
   const addToCart = () => {
     if (!product) return;
-    const stored = JSON.parse(localStorage.getItem("giftai_cart") || "[]");
+    const stored = JSON.parse(localStorage.getItem("giftara_cart") || "[]");
     const existing = stored.find(i => i.id === product.id);
     const updated = existing
       ? stored.map(i => i.id === product.id ? { ...i, qty: i.qty + qty } : i)
       : [...stored, { ...product, qty }];
-    localStorage.setItem("giftai_cart", JSON.stringify(updated));
+    localStorage.setItem("giftara_cart", JSON.stringify(updated));
     setCartAdded(true);
     setTimeout(() => setCartAdded(false), 2000);
   };

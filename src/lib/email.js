@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 
 export async function sendSplitPaymentEmail({ to, initiatorName, amount, paymentLink, orderSummary }) {
   const mailOptions = {
-    from: `"GiftAI Luxury" <${process.env.SMTP_USER}>`,
+    from: `"Giftara Luxury" <${process.env.SMTP_USER}>`,
     to,
     subject: `${initiatorName} invited you to split a gift order payment`,
     html: `
@@ -52,7 +52,7 @@ export async function sendSplitPaymentEmail({ to, initiatorName, amount, payment
       <body>
         <div class="container">
           <div class="header">
-            <div class="logo">✦ GiftAI</div>
+            <div class="logo">✦ Giftara</div>
           </div>
           <div class="content">
             <div class="greeting">Hello,</div>
@@ -91,7 +91,7 @@ export async function sendSplitPaymentEmail({ to, initiatorName, amount, payment
           <div class="footer">
             <div class="footer-text">
               Secure payment powered by Razorpay<br>
-              GiftAI Luxury Gifting Platform
+              Giftara Luxury Gifting Platform
             </div>
             <div class="link-text">${paymentLink}</div>
           </div>
@@ -112,7 +112,7 @@ export async function sendSplitPaymentEmail({ to, initiatorName, amount, payment
 
 export async function sendPaymentConfirmationEmail({ to, initiatorName, amount, paidBy }) {
   const mailOptions = {
-    from: `"GiftAI Luxury" <${process.env.SMTP_USER}>`,
+    from: `"Giftara Luxury" <${process.env.SMTP_USER}>`,
     to,
     subject: `Payment received from ${paidBy}`,
     html: `

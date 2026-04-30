@@ -11,7 +11,7 @@ const Logo = () => (
     <path d="M12 9 L12 5 Q12 3 14 3 Q16 3 16 5 Q16 7 14 9 Z" fill="#C9A84C"/>
     <rect x="6" y="9" width="12" height="3" rx="1.5" fill="#C9A84C"/>
     <rect x="11" y="12" width="2" height="19" rx="1" fill="#C9A84C" fillOpacity="0.55"/>
-    <text x="30" y="28" fontFamily="Georgia,serif" fontSize="21" fontWeight="700" fill="#C9A84C" letterSpacing="1.5">GiftAI</text>
+    <text x="30" y="28" fontFamily="Georgia,serif" fontSize="21" fontWeight="700" fill="#C9A84C" letterSpacing="1.5">Giftara</text>
   </svg>
 );
 
@@ -40,7 +40,7 @@ export default function CartPage() {
     fetchUser();
 
     setMounted(true);
-    const saved = localStorage.getItem("giftai_cart");
+    const saved = localStorage.getItem("giftara_cart");
     if (saved) setCart(JSON.parse(saved));
   }, []);
 
@@ -48,7 +48,7 @@ export default function CartPage() {
 
   const saveCart = (newCart) => {
     setCart(newCart);
-    localStorage.setItem("giftai_cart", JSON.stringify(newCart));
+    localStorage.setItem("giftara_cart", JSON.stringify(newCart));
   };
 
   const upd = (id, d) => saveCart(cart.map(i => i.id === id ? { ...i, qty: Math.max(1, i.qty + d) } : i));
@@ -219,7 +219,7 @@ export default function CartPage() {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: data.amount,
         currency: "INR",
-        name: "GiftAI Luxury",
+        name: "Giftara Luxury",
         description: "Order Payment",
         order_id: data.orderId,
         handler: async (response) => {

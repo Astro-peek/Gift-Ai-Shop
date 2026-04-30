@@ -19,7 +19,7 @@ const Logo = () => (
     <rect x="6" y="9" width="12" height="3" rx="1.5" fill="#E8C97A"/>
     <rect x="11" y="12" width="2" height="19" rx="1" fill="#C9A84C" fillOpacity="0.7"/>
     <line x1="6" y1="20.5" x2="18" y2="20.5" stroke="#C9A84C" strokeWidth="0.8" strokeOpacity="0.5"/>
-    <text x="30" y="28" fontFamily="Georgia,serif" fontSize="22" fontWeight="700" fill="url(#logoGrad)" letterSpacing="2">GiftAI</text>
+    <text x="30" y="28" fontFamily="Georgia,serif" fontSize="22" fontWeight="700" fill="url(#logoGrad)" letterSpacing="2">Giftara</text>
   </svg>
 );
 
@@ -56,7 +56,7 @@ export default function RegisterPage() {
       <div>
         <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "64px", color: GOLD, marginBottom: "20px" }}>✦</div>
         <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "42px", color: "#F0EAD6", marginBottom: "12px" }}>Check your inbox!</h1>
-        <p style={{ color: MUTED, fontSize: "14px", fontWeight: 300, maxWidth: "340px", lineHeight: 1.7 }}>We've sent a confirmation link to <a href={`mailto:${email}`} style={{ color: "#F0EAD6", fontWeight: 600, textDecoration: "underline" }}>{email}</a>. Click it to activate your GiftAI account.</p>
+        <p style={{ color: MUTED, fontSize: "14px", fontWeight: 300, maxWidth: "340px", lineHeight: 1.7 }}>We've sent a confirmation link to <a href={`mailto:${email}`} style={{ color: "#F0EAD6", fontWeight: 600, textDecoration: "underline" }}>{email}</a>. Click it to activate your Giftara account.</p>
         <a href="/login" style={{ display: "inline-block", marginTop: "32px", background: GOLD, color: DARK, padding: "13px 32px", borderRadius: "10px", fontWeight: 800, textDecoration: "none", fontSize: "14px" }}>Back to Login →</a>
       </div>
     </div>

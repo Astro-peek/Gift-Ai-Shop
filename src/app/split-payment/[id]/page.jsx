@@ -12,7 +12,7 @@ const Logo = ({ size = 28 }) => (
     <rect x="6" y="9" width="12" height="3" rx="1.5" fill="#C9A84C" />
     <rect x="11" y="12" width="2" height="19" rx="1" fill="#C9A84C" fillOpacity="0.55" />
     <line x1="6" y1="20.5" x2="18" y2="20.5" stroke="#C9A84C" strokeWidth="0.7" strokeOpacity="0.35" />
-    <text x="30" y="28" fontFamily="Georgia,serif" fontSize="21" fontWeight="700" fill="#C9A84C" letterSpacing="1.5">GiftAI</text>
+    <text x="30" y="28" fontFamily="Georgia,serif" fontSize="21" fontWeight="700" fill="#C9A84C" letterSpacing="1.5">Giftara</text>
   </svg>
 );
 

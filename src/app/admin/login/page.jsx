@@ -11,7 +11,7 @@ const Logo = () => (
     <path d="M12 9 L12 5 Q12 3 14 3 Q16 3 16 5 Q16 7 14 9 Z" fill="#C9A84C"/>
     <rect x="6" y="9" width="12" height="3" rx="1.5" fill="#C9A84C"/>
     <rect x="11" y="12" width="2" height="19" rx="1" fill="#C9A84C" fillOpacity="0.55"/>
-    <text x="30" y="28" fontFamily="Georgia,serif" fontSize="21" fontWeight="700" fill="#C9A84C" letterSpacing="1.5">GiftAI</text>
+    <text x="30" y="28" fontFamily="Georgia,serif" fontSize="21" fontWeight="700" fill="#C9A84C" letterSpacing="1.5">Giftara</text>
   </svg>
 );
 
@@ -78,7 +78,7 @@ export default function AdminLoginPage() {
           <form onSubmit={handleLogin}>
             <div style={{ marginBottom: "18px" }}>
               <label style={{ display: "block", fontSize: "11px", color: MUTED, fontWeight: 700, letterSpacing: "1.2px", marginBottom: "7px", textTransform: "uppercase" }}>Admin Email</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="admin@giftai.com" required style={inputStyle}/>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="admin@giftara.com" required style={inputStyle}/>
             </div>
             <div style={{ marginBottom: "24px" }}>
               <label style={{ display: "block", fontSize: "11px", color: MUTED, fontWeight: 700, letterSpacing: "1.2px", marginBottom: "7px", textTransform: "uppercase" }}>Security Password</label>

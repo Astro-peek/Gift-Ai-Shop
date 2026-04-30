@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Your Cart — GiftAI",
+  title: "Your Cart — Giftara",
   description: "Review your curated gift selection. Add a personal note, enter your delivery address, and checkout securely.",
 };
 

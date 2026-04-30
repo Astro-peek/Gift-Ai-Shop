@@ -18,7 +18,7 @@ const Logo = ({ size = 36 }) => (
     <rect x="6" y="9" width="12" height="3" rx="1.5" fill="#C9A84C"/>
     <rect x="11" y="12" width="2" height="19" rx="1" fill="#C9A84C" fillOpacity="0.55"/>
     <line x1="6" y1="20.5" x2="18" y2="20.5" stroke="#C9A84C" strokeWidth="0.7" strokeOpacity="0.35"/>
-    <text x="30" y="28" fontFamily="Georgia, 'Times New Roman', serif" fontSize="21" fontWeight="700" fill="#C9A84C" letterSpacing="1.5">GiftAI</text>
+    <text x="30" y="28" fontFamily="Georgia, 'Times New Roman', serif" fontSize="21" fontWeight="700" fill="#C9A84C" letterSpacing="1.5">Giftara</text>
   </svg>
 );
 
@@ -56,7 +56,7 @@ export default function HomePage() {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
-  const [msgs, setMsgs] = useState([{ role:"ai", text:"Welcome to GiftAI ✨ I'm your personal luxury gift concierge. Who are you shopping for today?" }]);
+  const [msgs, setMsgs] = useState([{ role:"ai", text:"Welcome to Giftara ✨ I'm your personal luxury gift concierge. Who are you shopping for today?" }]);
   const [isListening, setIsListening] = useState(false);
   const [imgErr, setImgErr] = useState({});
   const [productsLoading, setProductsLoading] = useState(true);
@@ -97,13 +97,13 @@ export default function HomePage() {
     fetchSess();
 
     setMounted(true);
-    const savedCart = localStorage.getItem("giftai_cart");
+    const savedCart = localStorage.getItem("giftara_cart");
     if (savedCart) setCart(JSON.parse(savedCart));
-    const savedWish = localStorage.getItem("giftai_wishlist");
+    const savedWish = localStorage.getItem("giftara_wishlist");
     if (savedWish) setWishlist(JSON.parse(savedWish));
 
     // Personalized feed: load viewed categories
-    const viewed = JSON.parse(localStorage.getItem("giftai_viewed_cats") || "[]");
+    const viewed = JSON.parse(localStorage.getItem("giftara_viewed_cats") || "[]");
     setViewedCategories(viewed);
   }, []);
 
@@ -126,11 +126,11 @@ export default function HomePage() {
 
   // ── Persist cart to localStorage ────────────────────────────────
   useEffect(() => {
-    localStorage.setItem("giftai_cart", JSON.stringify(cart));
+    localStorage.setItem("giftara_cart", JSON.stringify(cart));
   }, [cart]);
 
   useEffect(() => {
-    localStorage.setItem("giftai_wishlist", JSON.stringify(wishlist));
+    localStorage.setItem("giftara_wishlist", JSON.stringify(wishlist));
   }, [wishlist]);
 
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior:"smooth" }); }, [msgs]);
@@ -152,9 +152,9 @@ export default function HomePage() {
 
   // Track viewed category for personalized feed
   const trackView = (p) => {
-    const viewed = JSON.parse(localStorage.getItem("giftai_viewed_cats") || "[]");
+    const viewed = JSON.parse(localStorage.getItem("giftara_viewed_cats") || "[]");
     const updated = [...viewed, p.category].slice(-20);
-    localStorage.setItem("giftai_viewed_cats", JSON.stringify(updated));
+    localStorage.setItem("giftara_viewed_cats", JSON.stringify(updated));
     setViewedCategories(updated);
   };
 
@@ -201,7 +201,7 @@ export default function HomePage() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    localStorage.removeItem("giftai_user");
+    localStorage.removeItem("giftara_user");
     setUser(null);
     setUserMenuOpen(false);
     showToast("Signed out successfully");

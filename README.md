@@ -1,8 +1,8 @@
-# GiftAI ✨
+# Giftara ✨
 
 ### AI-Powered Luxury Gift Recommendations & Smart E-Commerce Platform
 
-GiftAI is a next-generation AI-driven e-commerce platform designed to eliminate the stress of finding the perfect gift. By combining **luxury product curation** with **Google Gemini AI intelligence**, **smart group payments**, and a **luxury shopping experience**, the platform delivers a personalized concierge experience tailored to the user's intent, emotions, and budget.
+Giftara is a next-generation AI-driven e-commerce platform designed to eliminate the stress of finding the perfect gift. By combining **luxury product curation** with **Google Gemini AI intelligence**, **smart group payments**, and a **luxury shopping experience**, the platform delivers a personalized concierge experience tailored to the user's intent, emotions, and budget.
 
 **🚀 Live Demo:** [https://gift-ai-shop.vercel.app](https://gift-ai-shop.vercel.app)
 
@@ -43,7 +43,7 @@ Most platforms focus on **products**, not **intent**. Users struggle to translat
 
 ## 💡 Solution
 
-GiftAI bridges this gap through:
+Giftara bridges this gap through:
 
 1. **AI-Powered Gift Concierge** - Natural language understanding for personalized recommendations
 2. **Split Payments** - Easy group gifting with automatic payment link generation
@@ -441,7 +441,7 @@ SMTP_HOST="smtp.gmail.com"
 SMTP_PORT="587"
 SMTP_USER="[EMAIL]"
 SMTP_PASS="[PASSWORD]"
-FROM_EMAIL="noreply@giftai.com"
+FROM_EMAIL="noreply@giftara.com"
 
 # Twilio (Optional - for SMS)
 TWILIO_ACCOUNT_SID="AC..."
@@ -527,7 +527,7 @@ A: Try-catch blocks, fallback AI responses, toast notifications, and graceful de
 
 ### Future Questions
 
-**Q: What's next for GiftAI?**
+**Q: What's next for Giftara?**
 A: Voice AI, AR gift preview, ML-based recommendation engine, international shipping.
 
 **Q: How would you add AR features?**
@@ -602,7 +602,7 @@ A: Integration with @google/model-viewer for 3D product preview (was planned, re
 
 ## 🏆 Hackathon Value
 
-GiftAI is not just an e-commerce app — it is an **AI-driven decision-making system** that transforms gifting into an intelligent, emotional, and personalized experience.
+Giftara is not just an e-commerce app — it is an **AI-driven decision-making system** that transforms gifting into an intelligent, emotional, and personalized experience.
 
 **Key Differentiators:**
 1. **AI + Commerce** - Not just recommendations, but conversational understanding
@@ -616,7 +616,7 @@ GiftAI is not just an e-commerce app — it is an **AI-driven decision-making sy
 
 Built with ❤️ for Next-Gen E-Commerce Hackathon 🚀
 
-**© 2024 GiftAI Team**
+**© 2024 Giftara Team**
 
 ---
 

@@ -1,4 +1,4 @@
-# 🏁 GiftAI Hackathon: Remaining Tasks
+# 🏁 Giftara Hackathon: Remaining Tasks
 
 This checklist tracks what needs to be done to transition from the **Mock MVP** to a **Production-Ready** application as described in the README.
 

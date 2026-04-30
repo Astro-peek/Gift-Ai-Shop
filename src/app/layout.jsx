@@ -2,23 +2,23 @@ import "./globals.css";
 import Script from "next/script";
 
 export const metadata = {
-  title: "GiftAI — AI-Powered Luxury Gift Recommendations",
-  description: "Discover the perfect luxury gift with GiftAI. Our AI concierge handpicks curated gifts for every occasion, recipient, and budget. From ₹1,299 to ₹12,999.",
+  title: "Giftara — AI-Powered Luxury Gift Recommendations",
+  description: "Discover the perfect luxury gift with Giftara. Our AI concierge handpicks curated gifts for every occasion, recipient, and budget. From ₹1,299 to ₹12,999.",
   keywords: "luxury gifts, AI gift recommendations, gift ideas India, premium gifts online, personalized gifts",
   icons: {
     icon: "/favicon.png",
     apple: "/favicon.png",
   },
   openGraph: {
-    title: "GiftAI — AI-Powered Luxury Gift Recommendations",
+    title: "Giftara — AI-Powered Luxury Gift Recommendations",
     description: "Find the perfect gift with AI. Curated luxury gifts for every occasion.",
     type: "website",
     locale: "en_IN",
-    siteName: "GiftAI",
+    siteName: "Giftara",
   },
   twitter: {
     card: "summary_large_image",
-    title: "GiftAI — AI-Powered Luxury Gifting",
+    title: "Giftara — AI-Powered Luxury Gifting",
     description: "AI-curated luxury gifts for every occasion and recipient.",
   },
 };

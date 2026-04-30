@@ -35,7 +35,7 @@ export function generateOrderEmail({ name, orderId, total, status }) {
           <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:560px;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e8e8ef;">
             <tr>
               <td style="background:#0f172a;padding:22px 24px;">
-                <div style="font-size:24px;font-weight:700;color:#f8fafc;letter-spacing:0.5px;">GiftAI</div>
+                <div style="font-size:24px;font-weight:700;color:#f8fafc;letter-spacing:0.5px;">Giftara</div>
                 <div style="font-size:13px;color:#cbd5e1;margin-top:6px;">Order Notification</div>
               </td>
             </tr>
@@ -43,7 +43,7 @@ export function generateOrderEmail({ name, orderId, total, status }) {
               <td style="padding:24px;">
                 <p style="margin:0 0 12px 0;font-size:16px;color:#111827;">Hi ${safeName},</p>
                 <p style="margin:0 0 20px 0;font-size:14px;line-height:1.6;color:#374151;">
-                  We wanted to share an update on your GiftAI order.
+                  We wanted to share an update on your Giftara order.
                 </p>
 
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border:1px solid #e5e7eb;border-radius:12px;background:#f9fafb;">
@@ -68,7 +68,7 @@ export function generateOrderEmail({ name, orderId, total, status }) {
                 </table>
 
                 <p style="margin:20px 0 0 0;font-size:12px;line-height:1.6;color:#6b7280;">
-                  Thank you for shopping with GiftAI. If you have questions, reply to this email and our support team will help.
+                  Thank you for shopping with Giftara. If you have questions, reply to this email and our support team will help.
                 </p>
               </td>
             </tr>

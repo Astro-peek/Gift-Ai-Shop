@@ -11,7 +11,7 @@ const Logo = () => (
     <path d="M12 9 L12 5 Q12 3 14 3 Q16 3 16 5 Q16 7 14 9 Z" fill="#C9A84C"/>
     <rect x="6" y="9" width="12" height="3" rx="1.5" fill="#C9A84C"/>
     <rect x="11" y="12" width="2" height="19" rx="1" fill="#C9A84C" fillOpacity="0.55"/>
-    <text x="30" y="28" fontFamily="Georgia,serif" fontSize="21" fontWeight="700" fill="#C9A84C" letterSpacing="1.5">GiftAI</text>
+    <text x="30" y="28" fontFamily="Georgia,serif" fontSize="21" fontWeight="700" fill="#C9A84C" letterSpacing="1.5">Giftara</text>
   </svg>
 );
 
@@ -68,7 +68,7 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    localStorage.removeItem("giftai_user");
+    localStorage.removeItem("giftara_user");
     window.location.href = "/login";
   };
 
@@ -95,7 +95,7 @@ export default function ProfilePage() {
               {user.user_metadata?.full_name ? user.user_metadata.full_name[0].toUpperCase() : user.email[0].toUpperCase()}
             </div>
             <div>
-              <div style={{ fontSize: "18px", fontWeight: 700, color: "#F0EAD6", marginBottom: "4px" }}>{user.user_metadata?.full_name || "GiftAI User"}</div>
+              <div style={{ fontSize: "18px", fontWeight: 700, color: "#F0EAD6", marginBottom: "4px" }}>{user.user_metadata?.full_name || "Giftara User"}</div>
               <div style={{ fontSize: "13px", color: MUTED }}>{user.email}</div>
             </div>
           </div>

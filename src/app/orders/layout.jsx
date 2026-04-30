@@ -1,6 +1,6 @@
 export const metadata = {
-  title: "My Orders — GiftAI",
-  description: "Track and manage your GiftAI orders. View order status, delivery progress, and order history.",
+  title: "My Orders — Giftara",
+  description: "Track and manage your Giftara orders. View order status, delivery progress, and order history.",
 };
 
 export default function OrdersLayout({ children }) {

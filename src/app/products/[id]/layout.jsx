@@ -1,10 +1,10 @@
 export async function generateMetadata({ params }) {
   return {
-    title: `Product Details — GiftAI`,
-    description: "View full details, AR preview, and curated gift notes for this premium GiftAI product.",
+    title: `Product Details — Giftara`,
+    description: "View full details, AR preview, and curated gift notes for this premium Giftara product.",
     openGraph: {
       type: "website",
-      siteName: "GiftAI",
+      siteName: "Giftara",
     },
   };
 }

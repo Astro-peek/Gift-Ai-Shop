@@ -11,7 +11,7 @@ const Logo=({size=28})=>(
     <rect x="6" y="9" width="12" height="3" rx="1.5" fill="#C9A84C"/>
     <rect x="11" y="12" width="2" height="19" rx="1" fill="#C9A84C" fillOpacity="0.55"/>
     <line x1="6" y1="20.5" x2="18" y2="20.5" stroke="#C9A84C" strokeWidth="0.7" strokeOpacity="0.35"/>
-    <text x="30" y="28" fontFamily="Georgia,serif" fontSize="21" fontWeight="700" fill="#C9A84C" letterSpacing="1.5">GiftAI</text>
+    <text x="30" y="28" fontFamily="Georgia,serif" fontSize="21" fontWeight="700" fill="#C9A84C" letterSpacing="1.5">Giftara</text>
   </svg>
 );
 
@@ -226,7 +226,7 @@ export default function RecommendPage(){
             <div className="emotion-tip" style={{background:SURFACE,border:`1px solid ${BORDER}`,borderRadius:"14px",padding:"20px 24px",marginBottom:"36px",display:"flex",alignItems:"center",gap:"16px"}}>
               <div style={{fontSize:"28px",color:GOLD,fontFamily:"'Cormorant Garamond',serif"}}>◈</div>
               <div>
-                <div style={{fontWeight:700,color:"#F0EAD6",fontSize:"15px",marginBottom:"3px"}}>GiftAI's Emotion Tip</div>
+                <div style={{fontWeight:700,color:"#F0EAD6",fontSize:"15px",marginBottom:"3px"}}>Giftara's Emotion Tip</div>
                 <div style={{fontSize:"13px",color:MUTED,lineHeight:1.5}}>Pair your gift with a handwritten card using the suggested note above. Gifts with personal notes are 3× more memorable, according to research. ✦</div>
               </div>
             </div>

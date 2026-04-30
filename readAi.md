@@ -1,12 +1,12 @@
-# 🤖 GiftAI — Project Intelligence Manifest (readAi)
+# 🤖 Giftara — Project Intelligence Manifest (readAi)
 ### Comprehensive End-to-End System Documentation
 
-This document provides a highly detailed overview of the **GiftAI** architecture, feature logic, and data flow for understanding by both developers and secondary AI systems.
+This document provides a highly detailed overview of the **Giftara** architecture, feature logic, and data flow for understanding by both developers and secondary AI systems.
 
 ---
 
 ## 🏗️ Core Architecture
-GiftAI is a full-stack Next.js 14 application leveraging the App Router. It follows a modular architecture where frontend components use React hooks for state management and communicate with a robust Node.js backend via API routes.
+Giftara is a full-stack Next.js 14 application leveraging the App Router. It follows a modular architecture where frontend components use React hooks for state management and communicate with a robust Node.js backend via API routes.
 
 - **Frontend**: Next.js (Client Components), Vanilla CSS (Premium Dark Theme).
 - **ORM & Data**: Prisma ORM with a Supabase PostgreSQL backend.
@@ -30,7 +30,7 @@ GiftAI is a full-stack Next.js 14 application leveraging the App Router. It foll
 - **Fallback**: If no behavior is tracked, the system displays top-rated products by default.
 
 ### 3. Shopping Cart & Hydration Strategy
-- **Persistence**: Cart items are stored as JSON in `localStorage` under the key `giftai_cart`.
+- **Persistence**: Cart items are stored as JSON in `localStorage` under the key `giftara_cart`.
 - **Hydration Fix**: To prevent Next.js hydration errors (server-client mismatch), the application initializes with an empty cart and utilizes a `mounted` state guard. The actual cart data is loaded only after the component satisfies `mounted === true` on the client.
 - **Functionality**: Local state `cart` manages quantities, removals, and subtotal calculations (with a ₹3,000 free shipping threshold).
 
@@ -78,4 +78,4 @@ GiftAI is a full-stack Next.js 14 application leveraging the App Router. It foll
 - **Admin Dashboard**: `/admin` (Requires `ADMIN` role check)
 
 ---
-*This file is designed as a context-injector for AI systems assisting in the development or maintenance of GiftAI.*
+*This file is designed as a context-injector for AI systems assisting in the development or maintenance of Giftara.*

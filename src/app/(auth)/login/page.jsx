@@ -11,7 +11,7 @@ const Logo = () => (
     <path d="M12 9 L12 5 Q12 3 14 3 Q16 3 16 5 Q16 7 14 9 Z" fill="#C9A84C"/>
     <rect x="6" y="9" width="12" height="3" rx="1.5" fill="#C9A84C"/>
     <rect x="11" y="12" width="2" height="19" rx="1" fill="#C9A84C" fillOpacity="0.55"/>
-    <text x="30" y="28" fontFamily="Georgia,serif" fontSize="21" fontWeight="700" fill="#C9A84C" letterSpacing="1.5">GiftAI</text>
+    <text x="30" y="28" fontFamily="Georgia,serif" fontSize="21" fontWeight="700" fill="#C9A84C" letterSpacing="1.5">Giftara</text>
   </svg>
 );
 
@@ -53,7 +53,7 @@ export default function LoginPage() {
         <div style={{ textAlign: "center", marginBottom: "40px" }}>
           <a href="/" style={{ display: "inline-block", marginBottom: "28px", textDecoration: "none" }}><Logo/></a>
           <h1 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "38px", color: "#F0EAD6", marginBottom: "8px", letterSpacing: "-0.5px" }}>Welcome back</h1>
-          <p style={{ color: MUTED, fontSize: "14px", fontWeight: 300 }}>Sign in to your GiftAI account</p>
+          <p style={{ color: MUTED, fontSize: "14px", fontWeight: 300 }}>Sign in to your Giftara account</p>
         </div>
 
         <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: "20px", padding: "36px" }}>
