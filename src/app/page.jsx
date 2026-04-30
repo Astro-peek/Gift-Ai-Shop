@@ -68,6 +68,7 @@ export default function HomePage() {
   const [viewedCategories, setViewedCategories] = useState([]);
   const [featuredGifts, setFeaturedGifts] = useState([]);
   const chatEndRef = useRef(null);
+  const canvasRef = useRef(null);
 
   // ── Fetch products from database ───────────────────────────────
   useEffect(() => {
@@ -136,6 +137,82 @@ export default function HomePage() {
   }, [wishlist]);
 
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior:"smooth" }); }, [msgs]);
+
+  // Particle constellation animation
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animationId;
+    let dots = [];
+    const DOT_COUNT = 55;
+    const CONNECTION_DIST = 90;
+    
+    const resize = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize);
+    
+    // Initialize dots
+    for (let i = 0; i < DOT_COUNT; i++) {
+      dots.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        radius: Math.random() * 2 + 1,
+        alpha: Math.random() * 0.5 + 0.2
+      });
+    }
+    
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Update and draw dots
+      dots.forEach((dot, i) => {
+        dot.x += dot.vx;
+        dot.y += dot.vy;
+        
+        // Bounce off edges
+        if (dot.x < 0 || dot.x > canvas.width) dot.vx *= -1;
+        if (dot.y < 0 || dot.y > canvas.height) dot.vy *= -1;
+        
+        // Draw dot
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, dot.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(201, 168, 76, ${dot.alpha})`;
+        ctx.fill();
+        
+        // Draw connections
+        for (let j = i + 1; j < dots.length; j++) {
+          const dx = dots[j].x - dot.x;
+          const dy = dots[j].y - dot.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if (dist < CONNECTION_DIST) {
+            const opacity = (1 - dist / CONNECTION_DIST) * 0.25;
+            ctx.beginPath();
+            ctx.moveTo(dot.x, dot.y);
+            ctx.lineTo(dots[j].x, dots[j].y);
+            ctx.strokeStyle = `rgba(201, 168, 76, ${opacity})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      });
+      
+      animationId = requestAnimationFrame(animate);
+    };
+    
+    animate();
+    
+    return () => {
+      cancelAnimationFrame(animationId);
+      window.removeEventListener('resize', resize);
+    };
+  }, []);
 
   if (!mounted) return <div style={{ minHeight: "100vh", background: DARK }} />;
 
@@ -381,26 +458,109 @@ export default function HomePage() {
           .hero-stats { gap: 16px !important; }
           .hero-stats > div { min-width: 100px; }
         }
+        
+        /* Staggered entrance animations */
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(18px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up {
+          animation: fadeUp 0.9s ease forwards;
+          opacity: 0;
+        }
+        .delay-1 { animation-delay: 0.3s; }
+        .delay-2 { animation-delay: 0.6s; }
+        .delay-3 { animation-delay: 0.85s; }
+        .delay-4 { animation-delay: 1.1s; }
+        .delay-5 { animation-delay: 1.3s; }
+        
+        /* Shimmer text effect */
+        .shimmer-text {
+          position: relative;
+          display: inline-block;
+        }
+        .shimmer-text::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 50%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 215, 100, 0.35), transparent);
+          animation: shimmerSweep 3s ease infinite;
+          animation-delay: 1.5s;
+          pointer-events: none;
+        }
+        @keyframes shimmerSweep {
+          0% { left: -100%; }
+          100% { left: 160%; }
+        }
+        
+        /* Button hover shimmer */
+        .btn-gold {
+          position: relative;
+          overflow: hidden;
+        }
+        .btn-gold::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 50%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 215, 100, 0.5), transparent);
+          transition: left 0.5s ease;
+        }
+        .btn-gold:hover::after {
+          left: 160%;
+        }
+        
+        /* Chat button pulse */
+        @keyframes pulseRing {
+          0% { box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.4); }
+          70% { box-shadow: 0 0 0 10px rgba(201, 168, 76, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(201, 168, 76, 0); }
+        }
+        .chat-pulse {
+          animation: pulseRing 2.5s ease-out infinite;
+          animation-delay: 2s;
+        }
+        
+        /* Respect reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+          .animate-fade-up,
+          .shimmer-text::after,
+          .btn-gold::after,
+          .chat-pulse {
+            animation: none !important;
+            opacity: 1 !important;
+            transform: none !important;
+          }
+        }
       `}</style>
 
       {/* HERO */}
       <section className="hero-section" style={{ textAlign:"center", padding:"100px 2rem 80px", position:"relative", overflow:"hidden" }}>
-        <div style={{ position:"absolute", top:"10%", left:"50%", transform:"translateX(-50%)", width:"700px", height:"350px", background:`radial-gradient(ellipse, ${GOLD}0F 0%, transparent 70%)`, pointerEvents:"none" }}/>
-        <div style={{ position:"absolute", top:0, left:0, right:0, bottom:0, backgroundImage:`repeating-linear-gradient(0deg, transparent, transparent 60px, ${GOLD}05 60px, ${GOLD}05 61px), repeating-linear-gradient(90deg, transparent, transparent 60px, ${GOLD}05 60px, ${GOLD}05 61px)`, pointerEvents:"none" }}/>
-        <div style={{ position:"relative" }}>
-          <div style={{ display:"inline-flex", alignItems:"center", gap:"8px", background:`${GOLD}0F`, border:`1px solid ${GOLD}28`, borderRadius:"40px", padding:"6px 20px", fontSize:"11px", color:GOLD, fontWeight:700, marginBottom:"28px", letterSpacing:"2.5px" }}>
-            <span style={{ width:"5px", height:"5px", borderRadius:"50%", background:GOLD, display:"inline-block" }}/>
+        {/* Particle constellation canvas */}
+        <canvas ref={canvasRef} style={{ position:"absolute", top:0, left:0, width:"100%", height:"100%", zIndex:0, pointerEvents:"none" }}/>
+        <div style={{ position:"absolute", top:"10%", left:"50%", transform:"translateX(-50%)", width:"700px", height:"350px", background:`radial-gradient(ellipse, ${GOLD}0F 0%, transparent 70%)`, pointerEvents:"none", zIndex:1 }}/>
+        <div style={{ position:"absolute", top:0, left:0, right:0, bottom:0, backgroundImage:`repeating-linear-gradient(0deg, transparent, transparent 60px, ${GOLD}05 60px, ${GOLD}05 61px), repeating-linear-gradient(90deg, transparent, transparent 60px, ${GOLD}05 60px, ${GOLD}05 61px)`, pointerEvents:"none", zIndex:1 }}/>
+        <div style={{ position:"relative", zIndex:2 }}>
+          <div className="animate-fade-up delay-1" style={{ display:"inline-flex", alignItems:"center", gap:"8px", background:`${GOLD}0F`, border:`1px solid ${GOLD}28`, borderRadius:"40px", padding:"6px 20px", fontSize:"11px", color:GOLD, fontWeight:700, marginBottom:"28px", letterSpacing:"2.5px" }}>
+            <span style={{ width:"5px", height:"5px", borderRadius:"50%", background:GOLD, display:"inline-block"}}/>
             AI-POWERED LUXURY GIFTING
           </div>
-          <h1 style={{ fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:"clamp(50px,8vw,92px)", fontWeight:700, lineHeight:1.02, marginBottom:"24px", color:"#F0EAD6", letterSpacing:"-1px" }}>
-            Gift with <span style={{ color:GOLD }}>intention.</span><br/>
+          <h1 className="animate-fade-up delay-2" style={{ fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:"clamp(50px,8vw,92px)", fontWeight:700, lineHeight:1.02, marginBottom:"24px", color:"#F0EAD6", letterSpacing:"-1px" }}>
+            Gift with <span className="shimmer-text" style={{ color:GOLD }}>intention.</span>
+          </h1>
+          <h1 className="animate-fade-up delay-3" style={{ fontFamily:"'Cormorant Garamond',Georgia,serif", fontSize:"clamp(50px,8vw,92px)", fontWeight:700, lineHeight:1.02, marginBottom:"24px", color:"#F0EAD6", letterSpacing:"-1px" }}>
             <em>Impress</em> with AI.
           </h1>
-          <p style={{ fontSize:"18px", color:MUTED, maxWidth:"480px", margin:"0 auto 44px", lineHeight:1.7, fontWeight:300 }}>
+          <p className="animate-fade-up delay-4" style={{ fontSize:"18px", color:MUTED, maxWidth:"480px", margin:"0 auto 44px", lineHeight:1.7, fontWeight:300 }}>
             Tell our concierge AI who you're shopping for. Get handpicked luxury recommendations — instantly.
           </p>
-          <div style={{ display:"flex", gap:"14px", justifyContent:"center", flexWrap:"wrap" }}>
-            <a href="/recommend" style={{ background:GOLD, color:DARK, padding:"15px 38px", borderRadius:"8px", fontWeight:800, fontSize:"14px", textDecoration:"none", letterSpacing:"0.8px" }}>Try Gift Recommender →</a>
+          <div className="animate-fade-up delay-5" style={{ display:"flex", gap:"14px", justifyContent:"center", flexWrap:"wrap" }}>
+            <a href="/recommend" className="btn-gold" style={{ background:GOLD, color:DARK, padding:"15px 38px", borderRadius:"8px", fontWeight:800, fontSize:"14px", textDecoration:"none", letterSpacing:"0.8px", position:"relative", overflow:"hidden" }}>Try Gift Recommender →</a>
             <button onClick={() => setChatOpen(true)} style={{ background:"transparent", border:`1px solid ${BORDER}`, color:"#F0EAD6", padding:"15px 38px", borderRadius:"8px", fontWeight:600, fontSize:"14px", cursor:"pointer", fontFamily:"'Nunito',sans-serif", letterSpacing:"0.5px" }}>Ask the Concierge</button>
           </div>
           <div className="hero-stats" style={{ display:"flex", gap:"56px", justifyContent:"center", marginTop:"70px" }}>
@@ -570,7 +730,7 @@ export default function HomePage() {
         </div>
       )}
       {!chatOpen && (
-        <button onClick={() => setChatOpen(true)} style={{ position:"fixed", bottom:"28px", right:"28px", background:GOLD, border:"none", borderRadius:"50%", width:"56px", height:"56px", cursor:"pointer", boxShadow:`0 8px 28px ${GOLD}40`, zIndex:999, color:DARK, display:"flex", alignItems:"center", justifyContent:"center" }}>
+        <button onClick={() => setChatOpen(true)} className="chat-pulse" style={{ position:"fixed", bottom:"28px", right:"28px", background:GOLD, border:"none", borderRadius:"50%", width:"56px", height:"56px", cursor:"pointer", boxShadow:`0 8px 28px ${GOLD}40`, zIndex:999, color:DARK, display:"flex", alignItems:"center", justifyContent:"center" }}>
           <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={DARK} strokeWidth="2.2" strokeLinecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         </button>
       )}
