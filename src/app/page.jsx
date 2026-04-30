@@ -330,7 +330,7 @@ export default function HomePage() {
         
         {/* Desktop Navigation */}
         <div style={{ display:"flex", gap:"2px" }} className="desktop-nav">
-          {[["Home","/"],["Recommend","/recommend"],["Split Payments","/split-payment"],["Orders","/orders"],["Admin","/admin"]].map(([n, href]) => (
+          {[["Home","/"],["Wellness","/wellness"],["Recommend","/recommend"],["Split Payments","/split-payment"],["Orders","/orders"],["Admin","/admin"]].map(([n, href]) => (
             <a key={n} href={href} style={{ color:MUTED, textDecoration:"none", padding:"7px 16px", borderRadius:"6px", fontSize:"13px", fontWeight:600, letterSpacing:"0.5px" }}>{n}</a>
           ))}
         </div>
@@ -406,7 +406,7 @@ export default function HomePage() {
           zIndex:99,
           padding:"1rem"
         }} className="mobile-menu-dropdown">
-          {[["Home","/"],["Recommend","/recommend"],["Orders","/orders"],["Admin","/admin"]].map(([n, href]) => (
+          {[["Home","/"],["Wellness","/wellness"],["Recommend","/recommend"],["Orders","/orders"],["Admin","/admin"]].map(([n, href]) => (
             <a key={n} href={href} onClick={() => setMobileMenuOpen(false)} style={{ display:"block", color:MUTED, textDecoration:"none", padding:"12px 0", borderBottom:`1px solid ${BORDER}`, fontSize:"14px", fontWeight:600 }}>{n}</a>
           ))}
         </div>
