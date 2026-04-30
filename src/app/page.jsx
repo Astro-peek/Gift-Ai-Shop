@@ -58,6 +58,8 @@ export default function HomePage() {
   const [chatLoading, setChatLoading] = useState(false);
   const [msgs, setMsgs] = useState([{ role:"ai", text:"Welcome to Giftara ✨ I'm your personal luxury gift concierge. Who are you shopping for today?" }]);
   const [isListening, setIsListening] = useState(false);
+  const [chatListening, setChatListening] = useState(false);
+  const [speakingIndex, setSpeakingIndex] = useState(null);
   const [imgErr, setImgErr] = useState({});
   const [productsLoading, setProductsLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -173,6 +175,37 @@ export default function HomePage() {
     r.onerror = () => setIsListening(false);
     r.onend = () => setIsListening(false);
     r.start();
+  };
+
+  // Voice input for chat
+  const handleChatVoice = () => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { showToast("Voice not supported in this browser"); return; }
+    const r = new SR(); r.lang = "en-IN"; r.continuous = false; r.interimResults = false;
+    r.onstart = () => setChatListening(true);
+    r.onresult = (e) => { setChatInput(e.results[0][0].transcript); setChatListening(false); };
+    r.onerror = () => setChatListening(false);
+    r.onend = () => setChatListening(false);
+    r.start();
+  };
+
+  // Text-to-speech for AI responses
+  const speakText = (text, index) => {
+    if (!window.speechSynthesis) { showToast("Speech not supported"); return; }
+    if (speakingIndex === index) {
+      window.speechSynthesis.cancel();
+      setSpeakingIndex(null);
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = "en-IN";
+    utter.rate = 0.95;
+    utter.pitch = 1;
+    utter.onend = () => setSpeakingIndex(null);
+    utter.onerror = () => setSpeakingIndex(null);
+    setSpeakingIndex(index);
+    window.speechSynthesis.speak(utter);
   };
 
   // Real LLM Chat via API route
@@ -504,8 +537,13 @@ export default function HomePage() {
           </div>
           <div style={{ flex:1, overflowY:"auto", padding:"16px", display:"flex", flexDirection:"column", gap:"12px" }}>
             {msgs.map((m, i) => (
-              <div key={i} style={{ display:"flex", justifyContent:m.role==="user"?"flex-end":"flex-start" }}>
-                <div style={{ maxWidth:"84%", padding:"11px 14px", borderRadius:m.role==="user"?"16px 16px 4px 16px":"16px 16px 16px 4px", background:m.role==="user"?`${GOLD}1A`:CARD, border:`1px solid ${m.role==="user"?GOLD+"33":BORDER}`, color:m.role==="user"?GOLD2:"#F0EAD6", fontSize:"13px", lineHeight:1.6 }}>
+              <div key={i} style={{ display:"flex", justifyContent:m.role==="user"?"flex-end":"flex-start", alignItems:"flex-end", gap:"6px" }}>
+                {m.role === "ai" && (
+                  <button onClick={() => speakText(m.text, i)} title={speakingIndex === i ? "Stop speaking" : "Read aloud"} style={{ background:"none", border:"none", cursor:"pointer", padding:"4px", color: speakingIndex === i ? GOLD : MUTED, fontSize:"14px", display:"flex", alignItems:"center" }}>
+                    {speakingIndex === i ? "⏹" : "🔊"}
+                  </button>
+                )}
+                <div style={{ maxWidth:"78%", padding:"11px 14px", borderRadius:m.role==="user"?"16px 16px 4px 16px":"16px 16px 16px 4px", background:m.role==="user"?`${GOLD}1A`:CARD, border:`1px solid ${m.role==="user"?GOLD+"33":BORDER}`, color:m.role==="user"?GOLD2:"#F0EAD6", fontSize:"13px", lineHeight:1.6 }}>
                   {m.text}
                 </div>
               </div>
@@ -521,9 +559,12 @@ export default function HomePage() {
             <div ref={chatEndRef}/>
           </div>
           <div style={{ padding:"12px 14px", borderTop:`1px solid ${BORDER}`, display:"flex", gap:"8px" }}>
+            <button onClick={handleChatVoice} disabled={chatListening} title="Voice input" style={{ background:CARD, border:`1px solid ${chatListening?GOLD:BORDER}`, borderRadius:"8px", padding:"10px", cursor:"pointer", color:chatListening?GOLD:MUTED, fontSize:"15px", display:"flex", alignItems:"center", transition:"all 0.2s" }}>
+              {chatListening ? "🎙" : "🎤"}
+            </button>
             <input value={chatInput} onChange={e => setChatInput(e.target.value)} onKeyDown={e => e.key === "Enter" && sendChat()}
-              placeholder="Who are you gifting for?"
-              style={{ flex:1, background:CARD, border:`1px solid ${BORDER}`, borderRadius:"8px", padding:"10px 13px", color:"#F0EAD6", fontSize:"13px", outline:"none", fontFamily:"'Nunito',sans-serif" }}/>
+              placeholder={chatListening ? "Listening..." : "Who are you gifting for?"}
+              style={{ flex:1, background:CARD, border:`1px solid ${chatListening?GOLD:BORDER}`, borderRadius:"8px", padding:"10px 13px", color:"#F0EAD6", fontSize:"13px", outline:"none", fontFamily:"'Nunito',sans-serif" }}/>
             <button onClick={sendChat} disabled={chatLoading} style={{ background:GOLD, border:"none", borderRadius:"8px", padding:"10px 14px", fontWeight:800, cursor:"pointer", color:DARK, fontSize:"13px", fontFamily:"'Nunito',sans-serif", opacity:chatLoading?0.6:1 }}>→</button>
           </div>
         </div>
