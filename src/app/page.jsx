@@ -582,6 +582,56 @@ export default function HomePage() {
         </div>
       )}
 
+      {/* FOOTER */}
+      <footer style={{ background: SURFACE, borderTop: `1px solid ${BORDER}`, marginTop: "80px", padding: "60px 24px 40px" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "40px" }}>
+          {/* Brand */}
+          <div>
+            <Logo size={28}/>
+            <p style={{ color: MUTED, fontSize: "13px", lineHeight: 1.7, marginTop: "16px" }}>
+              AI-powered luxury gifting. Discover curated gifts for every occasion, recipient, and budget.
+            </p>
+          </div>
+          {/* Quick Links */}
+          <div>
+            <h4 style={{ color: GOLD, fontSize: "11px", fontWeight: 800, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "16px" }}>Explore</h4>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <a href="/" style={{ color: "#F0EAD6", fontSize: "13px", textDecoration: "none", transition: "color 0.2s" }}>Home</a>
+              <a href="/recommend" style={{ color: "#F0EAD6", fontSize: "13px", textDecoration: "none", transition: "color 0.2s" }}>Gift Quiz</a>
+              <a href="/cart" style={{ color: "#F0EAD6", fontSize: "13px", textDecoration: "none", transition: "color 0.2s" }}>Cart</a>
+              <a href="/orders" style={{ color: "#F0EAD6", fontSize: "13px", textDecoration: "none", transition: "color 0.2s" }}>My Orders</a>
+            </div>
+          </div>
+          {/* Support */}
+          <div>
+            <h4 style={{ color: GOLD, fontSize: "11px", fontWeight: 800, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "16px" }}>Support</h4>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <a href="mailto:support@civicshield.com" style={{ color: "#F0EAD6", fontSize: "13px", textDecoration: "none" }}>Contact Us</a>
+              <span style={{ color: MUTED, fontSize: "13px" }}>Mon–Sat, 9am–7pm IST</span>
+              <span style={{ color: MUTED, fontSize: "13px" }}>Premium support for all orders</span>
+            </div>
+          </div>
+          {/* Social */}
+          <div>
+            <h4 style={{ color: GOLD, fontSize: "11px", fontWeight: 800, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: "16px" }}>Connect</h4>
+            <div style={{ display: "flex", gap: "12px" }}>
+              <a href="#" style={{ width: "36px", height: "36px", borderRadius: "50%", background: CARD, border: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "center", color: GOLD, fontSize: "16px", textDecoration: "none" }}>𝕏</a>
+              <a href="#" style={{ width: "36px", height: "36px", borderRadius: "50%", background: CARD, border: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "center", color: GOLD, fontSize: "16px", textDecoration: "none" }}>in</a>
+              <a href="#" style={{ width: "36px", height: "36px", borderRadius: "50%", background: CARD, border: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "center", color: GOLD, fontSize: "16px", textDecoration: "none" }}>📷</a>
+            </div>
+          </div>
+        </div>
+        {/* Bottom Bar */}
+        <div style={{ maxWidth: "1200px", margin: "48px auto 0", paddingTop: "24px", borderTop: `1px solid ${BORDER}`, display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "16px" }}>
+          <span style={{ color: MUTED, fontSize: "12px" }}>© 2025 Giftara. All rights reserved at Civicshield.</span>
+          <div style={{ display: "flex", gap: "24px" }}>
+            <a href="#" style={{ color: MUTED, fontSize: "12px", textDecoration: "none" }}>Privacy Policy</a>
+            <a href="#" style={{ color: MUTED, fontSize: "12px", textDecoration: "none" }}>Terms of Service</a>
+            <a href="#" style={{ color: MUTED, fontSize: "12px", textDecoration: "none" }}>Shipping Info</a>
+          </div>
+        </div>
+      </footer>
+
       {/* Close user menu on outside click */}
       {userMenuOpen && <div onClick={() => setUserMenuOpen(false)} style={{ position:"fixed", inset:0, zIndex:99 }}/>}
     </div>
